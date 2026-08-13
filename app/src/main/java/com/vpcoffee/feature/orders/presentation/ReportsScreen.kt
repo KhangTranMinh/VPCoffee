@@ -24,6 +24,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.annotation.StringRes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vpcoffee.R
+import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.orders.domain.model.Order
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -51,7 +52,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
                     Text(stringResource(R.string.report_total_income), style = MaterialTheme.typography.titleLarge)
-                    Text(stringResource(R.string.currency_vnd, totalIncome), style = MaterialTheme.typography.displaySmall)
+                    Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
                     Text(pluralStringResource(R.plurals.report_completed_orders, orders.size, orders.size), style = MaterialTheme.typography.bodyLarge)
                 }
             }
@@ -91,7 +92,7 @@ private fun OrderCard(order: Order) = Card(Modifier.fillMaxWidth()) {
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
         order.items.forEach { Text(stringResource(R.string.report_order_item, it.quantity, it.drinkName), style = MaterialTheme.typography.bodyLarge) }
-        Text(stringResource(R.string.label_total, stringResource(R.string.currency_vnd, order.total)), style = MaterialTheme.typography.titleMedium)
+        Text(stringResource(R.string.label_total, formatVnd(order.total)), style = MaterialTheme.typography.titleMedium)
     }
 }
 

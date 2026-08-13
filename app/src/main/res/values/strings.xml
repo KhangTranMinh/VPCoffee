@@ -23,6 +23,7 @@
     <string name="catalog_drink_name">Drink name</string>
     <string name="catalog_price_vnd">Price (VND)</string>
     <string name="catalog_choose_square_image">Choose square image</string>
+    <string name="catalog_take_photo">Take photo</string>
     <string name="action_save">Save</string>
     <string name="action_cancel">Cancel</string>
     <string name="catalog_no_image">Photo</string>
@@ -49,7 +50,7 @@
     <string name="report_no_completed_orders">No completed orders yet.</string>
     <string name="report_order_item">%1$d × %2$s</string>
     <string name="label_total">Total: %1$s</string>
-    <string name="currency_vnd">%1$d đ</string>
+    <string name="currency_vnd">%1$s đ</string>
     <string name="date_format_day">EEE, dd MMM yyyy</string>
     <string name="date_format_week">YYYY \'week\' ww</string>
     <string name="date_format_month">MMMM yyyy</string>

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vpcoffee.R
+import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.catalog.domain.model.Drink
 import com.vpcoffee.feature.orders.domain.model.OrderItem
 
@@ -53,7 +54,7 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
         }
         if (cart.isNotEmpty()) {
             Button(onClick = { showCart = true }, modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp)) {
-                Text(stringResource(R.string.sale_view_cart, cart.sumOf { it.quantity }, stringResource(R.string.currency_vnd, cart.sumOf { it.unitPrice * it.quantity })))
+                Text(stringResource(R.string.sale_view_cart, cart.sumOf { it.quantity }, formatVnd(cart.sumOf { it.unitPrice * it.quantity })))
             }
         }
     }
@@ -70,7 +71,7 @@ private fun DrinkCard(drink: Drink, onClick: () -> Unit) = Card(
 ) {
     Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(drink.name, style = MaterialTheme.typography.titleLarge)
-        Text(stringResource(R.string.currency_vnd, drink.price), style = MaterialTheme.typography.titleMedium)
+        Text(formatVnd(drink.price), style = MaterialTheme.typography.titleMedium)
         Text(stringResource(R.string.sale_tap_to_add), style = MaterialTheme.typography.bodyLarge)
     }
 }
@@ -83,13 +84,13 @@ private fun CartDialog(items: List<OrderItem>, onQuantityChange: (String, Int) -
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             items.forEach { item ->
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { Text(item.drinkName, style = MaterialTheme.typography.titleMedium); Text(stringResource(R.string.currency_vnd, item.unitPrice * item.quantity)) }
+                    Column(Modifier.weight(1f)) { Text(item.drinkName, style = MaterialTheme.typography.titleMedium); Text(formatVnd(item.unitPrice * item.quantity)) }
                     TextButton(onClick = { onQuantityChange(item.drinkId, item.quantity - 1) }) { Text(stringResource(R.string.sale_decrease_quantity)) }
                     Text("${item.quantity}", style = MaterialTheme.typography.titleLarge)
                     TextButton(onClick = { onQuantityChange(item.drinkId, item.quantity + 1) }) { Text(stringResource(R.string.sale_increase_quantity)) }
                 }
             }
-            Text(stringResource(R.string.label_total, stringResource(R.string.currency_vnd, items.sumOf { it.unitPrice * it.quantity })), style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.label_total, formatVnd(items.sumOf { it.unitPrice * it.quantity })), style = MaterialTheme.typography.titleLarge)
         }
     },
     confirmButton = { Button(onClick = onDone) { Text(stringResource(R.string.sale_done)) } },

@@ -1,5 +1,7 @@
 package com.vpcoffee.feature.catalog.presentation
 
+import android.content.Context
+import android.net.Uri
 import android.widget.ImageView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -37,8 +39,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.core.content.FileProvider
 import com.vpcoffee.R
+import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.catalog.domain.model.Drink
+import java.io.File
+import java.util.UUID
 
 @Composable
 fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
@@ -106,7 +112,7 @@ private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
             DrinkImage(drink.imageUri, Modifier.size(76.dp))
             Column(Modifier.weight(1f).padding(start = 16.dp)) {
                 Text(drink.name, style = MaterialTheme.typography.titleLarge)
-                Text(stringResource(R.string.currency_vnd, drink.price), style = MaterialTheme.typography.titleMedium)
+                Text(formatVnd(drink.price), style = MaterialTheme.typography.titleMedium)
             }
             IconButton(onClick = onDelete) { Text(stringResource(R.string.action_delete)) }
         }
@@ -115,10 +121,15 @@ private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
 
 @Composable
 private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSave: (String, String, String?) -> Unit) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     var name by remember(drink) { mutableStateOf(drink?.name.orEmpty()) }
     var price by remember(drink) { mutableStateOf(drink?.price?.toString().orEmpty()) }
     var imageUri by remember(drink) { mutableStateOf(drink?.imageUri) }
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> imageUri = uri?.toString() }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
+        if (isSaved) imageUri = cameraImageUri?.toString()
+    }
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(if (drink == null) R.string.catalog_add_drink else R.string.catalog_edit_drink)) },
@@ -127,12 +138,24 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                 OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.catalog_drink_name)) }, singleLine = true)
                 OutlinedTextField(price, { price = it }, label = { Text(stringResource(R.string.catalog_price_vnd)) }, singleLine = true)
                 Button(onClick = { imagePicker.launch("image/*") }) { Text(stringResource(R.string.catalog_choose_square_image)) }
+                Button(onClick = {
+                    createCameraImageUri(context).also { uri ->
+                        cameraImageUri = uri
+                        cameraLauncher.launch(uri)
+                    }
+                }) { Text(stringResource(R.string.catalog_take_photo)) }
                 imageUri?.let { DrinkImage(it, Modifier.size(88.dp)) }
             }
         },
         confirmButton = { TextButton(onClick = { onSave(name, price, imageUri) }) { Text(stringResource(R.string.action_save)) } },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
+}
+
+private fun createCameraImageUri(context: Context): Uri {
+    val imageDirectory = File(context.filesDir, "images").apply { mkdirs() }
+    val imageFile = File(imageDirectory, "drink-${UUID.randomUUID()}.jpg")
+    return FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", imageFile)
 }
 
 @Composable
