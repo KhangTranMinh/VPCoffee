@@ -42,22 +42,24 @@ import com.vpcoffee.R
 import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.orders.domain.model.Order
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-private enum class Grouping(@StringRes val labelRes: Int, @StringRes val patternRes: Int) {
-    DAY(R.string.report_day, R.string.date_format_day),
-    WEEK(R.string.report_week, R.string.date_format_week),
-    MONTH(R.string.report_month, R.string.date_format_month),
+private enum class ReportPeriod(@StringRes val labelRes: Int) {
+    DAY(R.string.report_day),
+    WEEK(R.string.report_week),
+    MONTH(R.string.report_month),
 }
 
 @Composable
 fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
     val orders by viewModel.orders.collectAsStateWithLifecycle()
-    var grouping by remember { mutableStateOf(Grouping.DAY) }
-    val totalIncome = orders.sumOf { it.total }
-    val drinkSales = orders.flatMap { it.items }.groupBy { it.drinkName }.mapValues { (_, items) -> items.sumOf { it.quantity } }.toList().sortedByDescending { it.second }
-    val groupedOrders = orders.groupBy { formatDate(it.createdAt, stringResource(grouping.patternRes)) }
+    var period by remember { mutableStateOf(ReportPeriod.DAY) }
+    val periodOrders = orders.filter { it.isInPeriod(period) }
+    val totalIncome = periodOrders.sumOf { it.total }
+    val drinkSales = periodOrders.flatMap { it.items }.groupBy { it.drinkName }.mapValues { (_, items) -> items.sumOf { it.quantity } }.toList().sortedByDescending { it.second }
+    val groupedOrders = periodOrders.groupBy { formatDate(it.createdAt, stringResource(R.string.date_format_day)) }
     var selectedOrder by remember { mutableStateOf<Order?>(null) }
 
     LazyColumn(
@@ -65,11 +67,11 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            TabRow(selectedTabIndex = Grouping.entries.indexOf(grouping)) {
-                Grouping.entries.forEach { option ->
+            TabRow(selectedTabIndex = ReportPeriod.entries.indexOf(period)) {
+                ReportPeriod.entries.forEach { option ->
                     Tab(
-                        selected = grouping == option,
-                        onClick = { grouping = option },
+                        selected = period == option,
+                        onClick = { period = option },
                         text = {
                             Text(
                                 stringResource(option.labelRes),
@@ -85,7 +87,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
                 Column(Modifier.padding(20.dp)) {
                     Text(stringResource(R.string.report_total_income), style = MaterialTheme.typography.titleLarge)
                     Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
-                    Text(pluralStringResource(R.plurals.report_completed_orders, orders.size, orders.size), style = MaterialTheme.typography.bodyLarge)
+                    Text(pluralStringResource(R.plurals.report_completed_orders, periodOrders.size, periodOrders.size), style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -169,3 +171,16 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
 }
 
 private fun formatDate(timestamp: Long, pattern: String): String = SimpleDateFormat(pattern, Locale.getDefault()).format(Date(timestamp))
+
+private fun Order.isInPeriod(period: ReportPeriod): Boolean {
+    val now = Calendar.getInstance()
+    val orderDate = Calendar.getInstance().apply { timeInMillis = createdAt }
+    return when (period) {
+        ReportPeriod.DAY -> orderDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+            orderDate.get(Calendar.DAY_OF_YEAR) == now.get(Calendar.DAY_OF_YEAR)
+        ReportPeriod.WEEK -> orderDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+            orderDate.get(Calendar.WEEK_OF_YEAR) == now.get(Calendar.WEEK_OF_YEAR)
+        ReportPeriod.MONTH -> orderDate.get(Calendar.YEAR) == now.get(Calendar.YEAR) &&
+            orderDate.get(Calendar.MONTH) == now.get(Calendar.MONTH)
+    }
+}
