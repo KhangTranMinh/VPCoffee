@@ -29,7 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vpcoffee.core.di.AppContainer
 import com.vpcoffee.feature.catalog.presentation.CatalogScreen
 import com.vpcoffee.feature.catalog.presentation.CatalogViewModel
-import com.vpcoffee.feature.notifications.presentation.NotificationSettingsScreen
+import com.vpcoffee.feature.settings.presentation.SettingsScreen
 import com.vpcoffee.feature.orders.presentation.ReportsScreen
 import com.vpcoffee.feature.orders.presentation.ReportsViewModel
 import com.vpcoffee.feature.sales.presentation.PointOfSaleScreen
@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
                         AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
                         AppTab.CATALOG -> CatalogScreen(catalogViewModel, padding)
                         AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding)
-                        AppTab.SETTINGS -> NotificationSettingsScreen(padding)
+                        AppTab.SETTINGS -> SettingsScreen(padding)
                     }
                 }
             }

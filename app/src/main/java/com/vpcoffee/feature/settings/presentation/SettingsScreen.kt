@@ -1,4 +1,4 @@
-package com.vpcoffee.feature.notifications.presentation
+package com.vpcoffee.feature.settings.presentation
 
 import android.content.Intent
 import android.content.ComponentName
@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun NotificationSettingsScreen(contentPadding: PaddingValues) {
+fun SettingsScreen(contentPadding: PaddingValues) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var notificationAccessGranted by androidx.compose.runtime.remember {
