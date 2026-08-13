@@ -48,7 +48,11 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
     val cart by viewModel.cart.collectAsStateWithLifecycle()
     var showCart by remember { mutableStateOf(false) }
     var completedMessage by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(bottom = contentPadding.calculateBottomPadding()),
+    ) {
         if (drinks.isEmpty()) {
             Text(stringResource(R.string.sale_add_drinks_first), modifier = Modifier.align(Alignment.Center).padding(32.dp), style = MaterialTheme.typography.titleLarge)
         } else {
@@ -77,7 +81,7 @@ private fun DrinkCard(drink: Drink, onClick: () -> Unit) = Card(
     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
 ) {
     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        DrinkImage(drink.imageUri, Modifier.fillMaxWidth().aspectRatio(1f))
+        DrinkImage(drink.imageUri, Modifier.fillMaxWidth().aspectRatio(1f), onClick)
         Text(drink.name, style = MaterialTheme.typography.titleLarge)
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(formatVnd(drink.price), modifier = Modifier.weight(1f), style = MaterialTheme.typography.titleMedium)
@@ -91,15 +95,20 @@ private fun DrinkCard(drink: Drink, onClick: () -> Unit) = Card(
 }
 
 @Composable
-private fun DrinkImage(uri: String?, modifier: Modifier) {
+private fun DrinkImage(uri: String?, modifier: Modifier, onClick: () -> Unit) {
     if (uri == null) {
-        Box(modifier, contentAlignment = Alignment.Center) {
+        Box(modifier.clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(Icons.Default.Image, contentDescription = stringResource(R.string.sale_drink_image), modifier = Modifier.size(48.dp))
         }
     } else {
         AndroidView(
             modifier = modifier,
-            factory = { context -> ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP } },
+            factory = { context ->
+                ImageView(context).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setOnClickListener { onClick() }
+                }
+            },
             update = { it.setImageURI(android.net.Uri.parse(uri)) },
         )
     }
