@@ -57,4 +57,5 @@
     <string name="date_format_week">YYYY \'week\' ww</string>
     <string name="date_format_month">MMMM yyyy</string>
     <string name="date_format_time">HH:mm</string>
+    <string name="date_format_order_details">dd/MM/yyyy - HH:mm</string>
 </resources>

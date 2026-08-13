@@ -3,6 +3,9 @@ package com.vpcoffee.feature.orders.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -13,6 +16,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
@@ -31,6 +36,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Schedule
 import com.vpcoffee.R
 import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.orders.domain.model.Order
@@ -126,7 +133,19 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
     ) {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Text(stringResource(R.string.report_order_details), style = MaterialTheme.typography.displaySmall)
-            Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    formatDate(order.createdAt, stringResource(R.string.date_format_order_details)),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
             LazyColumn(
                 modifier = Modifier.heightIn(max = 420.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -140,7 +159,7 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
             }
             Text(
                 stringResource(R.string.label_total, formatVnd(order.total)),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.primary,
             )
             Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(64.dp)) {
