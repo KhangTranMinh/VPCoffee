@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">VPCoffee</string>
+    <string name="settings_notification_speech_title">Notification speech</string>
+    <string name="settings_notification_access_granted">Notification access granted</string>
+    <string name="settings_notification_access_not_granted">Notification access not granted</string>
+    <string name="settings_notification_access_granted_description">VPCoffee can read supported notifications aloud.</string>
+    <string name="settings_notification_access_not_granted_description">Grant access to let VPCoffee read supported notifications aloud.</string>
+    <string name="settings_notification_access_instruction">VPCoffee can read MoMo notifications aloud. Turn on notification access in Android settings to enable it.</string>
+    <string name="settings_open_notification_access">Open notification access settings</string>
 </resources>

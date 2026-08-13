@@ -24,6 +24,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.vpcoffee.R
 
 @Composable
 fun SettingsScreen(contentPadding: PaddingValues) {
@@ -50,7 +52,7 @@ fun SettingsScreen(contentPadding: PaddingValues) {
         ),
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
-        Text("Notification speech", style = MaterialTheme.typography.headlineMedium)
+        Text(stringResource(R.string.settings_notification_speech_title), style = MaterialTheme.typography.headlineMedium)
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = if (notificationAccessGranted) {
@@ -62,20 +64,25 @@ fun SettingsScreen(contentPadding: PaddingValues) {
         ) {
             Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    if (notificationAccessGranted) "Notification access granted" else "Notification access not granted",
+                    stringResource(
+                        if (notificationAccessGranted) R.string.settings_notification_access_granted
+                        else R.string.settings_notification_access_not_granted,
+                    ),
                     style = MaterialTheme.typography.titleLarge,
                 )
                 Text(
-                    if (notificationAccessGranted) "VPCoffee can read supported notifications aloud."
-                    else "Grant access to let VPCoffee read supported notifications aloud.",
+                    stringResource(
+                        if (notificationAccessGranted) R.string.settings_notification_access_granted_description
+                        else R.string.settings_notification_access_not_granted_description,
+                    ),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
         }
-        Text("VPCoffee can read MoMo notifications aloud. Turn on notification access in Android settings to enable it.", style = MaterialTheme.typography.bodyLarge)
         if (!notificationAccessGranted) {
+            Text(stringResource(R.string.settings_notification_access_instruction), style = MaterialTheme.typography.bodyLarge)
             Button(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) {
-                Text("Open notification access settings")
+                Text(stringResource(R.string.settings_open_notification_access))
             }
         }
     }
