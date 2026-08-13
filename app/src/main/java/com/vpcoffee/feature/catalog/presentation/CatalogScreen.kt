@@ -178,7 +178,7 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
             tonalElevation = AlertDialogDefaults.TonalElevation,
         ) {
             Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(stringResource(if (drink == null) R.string.catalog_add_drink else R.string.catalog_edit_drink), style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(if (drink == null) R.string.catalog_add_drink else R.string.catalog_edit_drink), style = MaterialTheme.typography.displaySmall)
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
