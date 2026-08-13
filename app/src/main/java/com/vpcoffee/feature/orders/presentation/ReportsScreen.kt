@@ -20,6 +20,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.annotation.StringRes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vpcoffee.R
@@ -51,7 +52,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
                 Column(Modifier.padding(20.dp)) {
                     Text(stringResource(R.string.report_total_income), style = MaterialTheme.typography.titleLarge)
                     Text(stringResource(R.string.currency_vnd, totalIncome), style = MaterialTheme.typography.displaySmall)
-                    Text(stringResource(R.plurals.report_completed_orders, orders.size, orders.size), style = MaterialTheme.typography.bodyLarge)
+                    Text(pluralStringResource(R.plurals.report_completed_orders, orders.size, orders.size), style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
