@@ -158,12 +158,18 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
     }
     var imageUri by remember(drink) { mutableStateOf(drink?.imageUri) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> imageUri = uri?.toString() }
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        uri?.let { selectedUri ->
+            coroutineScope.launch {
+                imageUri = (cropImageToSquare(context, selectedUri) ?: selectedUri).toString()
+            }
+        }
+    }
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
         cameraImageUri?.let { uri ->
             if (isSaved) {
                 coroutineScope.launch {
-                    if (cropImageToSquare(context, uri)) imageUri = uri.toString()
+                    imageUri = (cropImageToSquare(context, uri) ?: uri).toString()
                 }
             }
         }
