@@ -4,11 +4,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -23,6 +29,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.annotation.StringRes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.vpcoffee.R
 import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.orders.domain.model.Order
@@ -43,6 +51,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
     val totalIncome = orders.sumOf { it.total }
     val drinkSales = orders.flatMap { it.items }.groupBy { it.drinkName }.mapValues { (_, items) -> items.sumOf { it.quantity } }.toList().sortedByDescending { it.second }
     val groupedOrders = orders.groupBy { formatDate(it.createdAt, stringResource(grouping.patternRes)) }
+    var selectedOrder by remember { mutableStateOf<Order?>(null) }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp, contentPadding.calculateTopPadding() + 16.dp, 16.dp, contentPadding.calculateBottomPadding() + 24.dp),
@@ -88,18 +97,56 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
         } else {
             groupedOrders.forEach { (label, group) ->
                 item { Text(label, style = MaterialTheme.typography.headlineSmall) }
-                items(group, key = { it.id }) { order -> OrderCard(order) }
+                items(group, key = { it.id }) { order -> OrderCard(order) { selectedOrder = order } }
             }
         }
+    }
+    selectedOrder?.let { order -> OrderDetailsDialog(order, onDismiss = { selectedOrder = null }) }
+}
+
+@Composable
+private fun OrderCard(order: Order, onClick: () -> Unit) = Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
+        val itemCount = order.items.sumOf { it.quantity }
+        Text(pluralStringResource(R.plurals.report_order_items, itemCount, itemCount), style = MaterialTheme.typography.bodyLarge)
+        Text(stringResource(R.string.label_total, formatVnd(order.total)), style = MaterialTheme.typography.titleMedium)
     }
 }
 
 @Composable
-private fun OrderCard(order: Order) = Card(Modifier.fillMaxWidth()) {
-    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
-        order.items.forEach { Text(stringResource(R.string.report_order_item, it.quantity, it.drinkName), style = MaterialTheme.typography.bodyLarge) }
-        Text(stringResource(R.string.label_total, formatVnd(order.total)), style = MaterialTheme.typography.titleMedium)
+private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        shape = AlertDialogDefaults.shape,
+        tonalElevation = AlertDialogDefaults.TonalElevation,
+    ) {
+        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(stringResource(R.string.report_order_details), style = MaterialTheme.typography.displaySmall)
+            Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(order.items, key = { it.drinkId }) { item ->
+                    Text(
+                        stringResource(R.string.report_order_item, item.quantity, item.drinkName),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+            }
+            Text(
+                stringResource(R.string.label_total, formatVnd(order.total)),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(64.dp)) {
+                Text(stringResource(R.string.action_ok), style = MaterialTheme.typography.titleMedium)
+            }
+        }
     }
 }
 
