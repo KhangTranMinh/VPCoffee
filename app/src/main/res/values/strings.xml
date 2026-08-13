@@ -34,6 +34,7 @@
     <string name="sale_order_saved_message">The completed order was saved successfully.</string>
     <string name="action_ok">OK</string>
     <string name="sale_tap_to_add">Tap to add</string>
+    <string name="sale_drink_image">Drink image</string>
     <string name="sale_your_cart">Your cart</string>
     <string name="sale_decrease_quantity">Decrease quantity</string>
     <string name="sale_increase_quantity">Increase quantity</string>
