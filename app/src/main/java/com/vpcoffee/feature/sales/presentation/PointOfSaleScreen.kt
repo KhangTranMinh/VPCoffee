@@ -149,14 +149,12 @@ private fun CartDialog(
                     modifier = Modifier.size(36.dp),
                     tint = MaterialTheme.colorScheme.primary,
                 )
-                Column(Modifier.padding(start = 12.dp)) {
-                    Text(stringResource(R.string.sale_your_cart), style = MaterialTheme.typography.headlineSmall)
-                    Text(
-                        formatVnd(total),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
+                Text(
+                    stringResource(R.string.label_total, formatVnd(total)),
+                    modifier = Modifier.padding(start = 12.dp),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                )
             }
             LazyColumn(
                 modifier = Modifier.heightIn(max = 420.dp),
