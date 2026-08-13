@@ -25,6 +25,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -45,6 +46,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.content.FileProvider
 import com.vpcoffee.R
@@ -173,13 +177,21 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Button(onClick = { imagePicker.launch("image/*") }) { Text(stringResource(R.string.catalog_choose_square_image)) }
+                Button(onClick = { imagePicker.launch("image/*") }) {
+                    Icon(Icons.Default.PhotoLibrary, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.catalog_choose_square_image))
+                }
                 Button(onClick = {
                     createCameraImageUri(context).also { uri ->
                         cameraImageUri = uri
                         cameraLauncher.launch(uri)
                     }
-                }) { Text(stringResource(R.string.catalog_take_photo)) }
+                }) {
+                    Icon(Icons.Default.PhotoCamera, contentDescription = null)
+                    Spacer(Modifier.size(8.dp))
+                    Text(stringResource(R.string.catalog_take_photo))
+                }
                 imageUri?.let { DrinkImage(it, Modifier.size(88.dp)) }
                 Row(Modifier.fillMaxWidth()) {
                     Spacer(Modifier.weight(1f))
