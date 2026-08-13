@@ -2,6 +2,7 @@ package com.vpcoffee.feature.sales.presentation
 
 import android.widget.ImageView
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.foundation.lazy.items as lazyItems
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -46,6 +47,7 @@ import com.vpcoffee.R
 import com.vpcoffee.core.ui.formatVnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -82,7 +84,49 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
     if (showCart) CartDialog(cart, drinks, { id, quantity -> viewModel.changeQuantity(id, quantity) }, onDismiss = { showCart = false }) {
         viewModel.completeOrder { showCart = false; completedMessage = true }
     }
-    if (completedMessage) AlertDialog(onDismissRequest = { completedMessage = false }, title = { Text(stringResource(R.string.sale_order_saved)) }, text = { Text(stringResource(R.string.sale_order_saved_message)) }, confirmButton = { TextButton(onClick = { completedMessage = false }) { Text(stringResource(R.string.action_ok)) } })
+    if (completedMessage) OrderSavedDialog { completedMessage = false }
+}
+
+@Composable
+private fun OrderSavedDialog(onDismiss: () -> Unit) = Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+) {
+    androidx.compose.material3.Surface(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        shape = AlertDialogDefaults.shape,
+        tonalElevation = AlertDialogDefaults.TonalElevation,
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            androidx.compose.material3.Surface(
+                modifier = Modifier.size(96.dp),
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.primaryContainer,
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Default.AccountBalanceWallet,
+                        contentDescription = null,
+                        modifier = Modifier.size(56.dp),
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            Text(stringResource(R.string.sale_order_saved), style = MaterialTheme.typography.headlineSmall)
+            Text(
+                stringResource(R.string.sale_order_saved_message),
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+            )
+            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(64.dp)) {
+                Text(stringResource(R.string.action_ok), style = MaterialTheme.typography.titleMedium)
+            }
+        }
+    }
 }
 
 @Composable
