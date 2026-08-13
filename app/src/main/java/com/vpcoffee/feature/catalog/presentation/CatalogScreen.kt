@@ -46,7 +46,11 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
     var editingDrink by remember { mutableStateOf<Drink?>(null) }
     var showAddDialog by remember { mutableStateOf(false) }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(bottom = contentPadding.calculateBottomPadding()),
+    ) {
         if (drinks.isEmpty()) {
             Column(
                 modifier = Modifier
