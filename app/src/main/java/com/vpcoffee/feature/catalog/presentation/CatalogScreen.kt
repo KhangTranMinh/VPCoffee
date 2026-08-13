@@ -43,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -138,7 +140,9 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
     val context = androidx.compose.ui.platform.LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var name by remember(drink) { mutableStateOf(drink?.name.orEmpty()) }
-    var price by remember(drink) { mutableStateOf(drink?.price?.let(::formatNumber).orEmpty()) }
+    var price by remember(drink) {
+        mutableStateOf(TextFieldValue(drink?.price?.let(::formatNumber).orEmpty()))
+    }
     var imageUri by remember(drink) { mutableStateOf(drink?.imageUri) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> imageUri = uri?.toString() }
@@ -173,7 +177,18 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                 OutlinedTextField(
                     value = price,
                     onValueChange = { input ->
-                        price = input.filter(Char::isDigit).toLongOrNull()?.let(::formatNumber).orEmpty()
+                        val digitCountBeforeCursor = input.text
+                            .take(input.selection.start)
+                            .count(Char::isDigit)
+                        val formattedPrice = input.text
+                            .filter(Char::isDigit)
+                            .toLongOrNull()
+                            ?.let(::formatNumber)
+                            .orEmpty()
+                        price = TextFieldValue(
+                            text = formattedPrice,
+                            selection = TextRange(cursorAfterDigits(formattedPrice, digitCountBeforeCursor)),
+                        )
                     },
                     label = { Text(stringResource(R.string.catalog_price_vnd)) },
                     singleLine = true,
@@ -199,11 +214,23 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                 Row(Modifier.fillMaxWidth()) {
                     Spacer(Modifier.weight(1f))
                     TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
-                    TextButton(onClick = { onSave(name, price, imageUri) }) { Text(stringResource(R.string.action_save)) }
+                    TextButton(onClick = { onSave(name, price.text, imageUri) }) { Text(stringResource(R.string.action_save)) }
                 }
             }
         }
     }
+}
+
+private fun cursorAfterDigits(text: String, digitCount: Int): Int {
+    if (digitCount == 0) return 0
+    var digitsSeen = 0
+    text.forEachIndexed { index, character ->
+        if (character.isDigit()) {
+            digitsSeen++
+            if (digitsSeen == digitCount) return index + 1
+        }
+    }
+    return text.length
 }
 
 private fun createCameraImageUri(context: Context): Uri {
