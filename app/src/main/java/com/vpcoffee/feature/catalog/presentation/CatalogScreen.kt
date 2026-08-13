@@ -35,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vpcoffee.R
 import com.vpcoffee.feature.catalog.domain.model.Drink
 
 @Composable
@@ -52,8 +54,8 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text("No drinks yet", style = MaterialTheme.typography.headlineSmall)
-                Text("Add your first drink to start taking orders.", style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.catalog_no_drinks), style = MaterialTheme.typography.headlineSmall)
+                Text(stringResource(R.string.catalog_add_first_drink), style = MaterialTheme.typography.bodyLarge)
             }
         } else {
             LazyColumn(
@@ -75,7 +77,7 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(24.dp),
-        ) { Text("Add") }
+        ) { Text(stringResource(R.string.action_add)) }
     }
 
     if (showAddDialog) DrinkEditorDialog(onDismiss = { showAddDialog = false }) { name, price, image ->
@@ -100,9 +102,9 @@ private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
             DrinkImage(drink.imageUri, Modifier.size(76.dp))
             Column(Modifier.weight(1f).padding(start = 16.dp)) {
                 Text(drink.name, style = MaterialTheme.typography.titleLarge)
-                Text("${drink.price} đ", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.currency_vnd, drink.price), style = MaterialTheme.typography.titleMedium)
             }
-            IconButton(onClick = onDelete) { Text("Delete") }
+            IconButton(onClick = onDelete) { Text(stringResource(R.string.action_delete)) }
         }
     }
 }
@@ -115,24 +117,24 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> imageUri = uri?.toString() }
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(if (drink == null) "Add drink" else "Edit drink") },
+        title = { Text(stringResource(if (drink == null) R.string.catalog_add_drink else R.string.catalog_edit_drink)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(name, { name = it }, label = { Text("Drink name") }, singleLine = true)
-                OutlinedTextField(price, { price = it }, label = { Text("Price (VND)") }, singleLine = true)
-                Button(onClick = { imagePicker.launch("image/*") }) { Text("Choose square image") }
+                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.catalog_drink_name)) }, singleLine = true)
+                OutlinedTextField(price, { price = it }, label = { Text(stringResource(R.string.catalog_price_vnd)) }, singleLine = true)
+                Button(onClick = { imagePicker.launch("image/*") }) { Text(stringResource(R.string.catalog_choose_square_image)) }
                 imageUri?.let { DrinkImage(it, Modifier.size(88.dp)) }
             }
         },
-        confirmButton = { TextButton(onClick = { onSave(name, price, imageUri) }) { Text("Save") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        confirmButton = { TextButton(onClick = { onSave(name, price, imageUri) }) { Text(stringResource(R.string.action_save)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
 }
 
 @Composable
 private fun DrinkImage(uri: String?, modifier: Modifier = Modifier) {
     if (uri == null) {
-        Box(modifier.aspectRatio(1f), contentAlignment = Alignment.Center) { Text("Photo") }
+        Box(modifier.aspectRatio(1f), contentAlignment = Alignment.Center) { Text(stringResource(R.string.catalog_no_image)) }
     } else {
         AndroidView(
             modifier = modifier.aspectRatio(1f),

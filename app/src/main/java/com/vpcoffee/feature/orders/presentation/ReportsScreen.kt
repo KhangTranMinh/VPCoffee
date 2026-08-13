@@ -19,16 +19,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vpcoffee.R
 import com.vpcoffee.feature.orders.domain.model.Order
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private enum class Grouping(val label: String, val pattern: String) {
-    DAY("Day", "EEE, dd MMM yyyy"),
-    WEEK("Week", "YYYY 'week' ww"),
-    MONTH("Month", "MMMM yyyy"),
+private enum class Grouping(@StringRes val labelRes: Int, @StringRes val patternRes: Int) {
+    DAY(R.string.report_day, R.string.date_format_day),
+    WEEK(R.string.report_week, R.string.date_format_week),
+    MONTH(R.string.report_month, R.string.date_format_month),
 }
 
 @Composable
@@ -37,7 +40,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
     var grouping by remember { mutableStateOf(Grouping.DAY) }
     val totalIncome = orders.sumOf { it.total }
     val drinkSales = orders.flatMap { it.items }.groupBy { it.drinkName }.mapValues { (_, items) -> items.sumOf { it.quantity } }.toList().sortedByDescending { it.second }
-    val groupedOrders = orders.groupBy { formatDate(it.createdAt, grouping.pattern) }
+    val groupedOrders = orders.groupBy { formatDate(it.createdAt, stringResource(grouping.patternRes)) }
 
     LazyColumn(
         contentPadding = PaddingValues(16.dp, contentPadding.calculateTopPadding() + 16.dp, 16.dp, contentPadding.calculateBottomPadding() + 24.dp),
@@ -46,30 +49,33 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
         item {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
-                    Text("Total income", style = MaterialTheme.typography.titleLarge)
-                    Text("$totalIncome đ", style = MaterialTheme.typography.displaySmall)
-                    Text("${orders.size} completed orders", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.report_total_income), style = MaterialTheme.typography.titleLarge)
+                    Text(stringResource(R.string.currency_vnd, totalIncome), style = MaterialTheme.typography.displaySmall)
+                    Text(stringResource(R.plurals.report_completed_orders, orders.size, orders.size), style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
         item {
-            Text("Group orders by", style = MaterialTheme.typography.titleLarge)
+            Text(stringResource(R.string.report_group_orders_by), style = MaterialTheme.typography.titleLarge)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Grouping.entries.forEach { option -> TextButton(onClick = { grouping = option }) { Text(if (grouping == option) "• ${option.label}" else option.label) } }
+                Grouping.entries.forEach { option ->
+                    val label = stringResource(option.labelRes)
+                    TextButton(onClick = { grouping = option }) { Text(if (grouping == option) stringResource(R.string.report_selected_grouping, label) else label) }
+                }
             }
         }
         if (drinkSales.isNotEmpty()) {
-            item { Text("Drink sales", style = MaterialTheme.typography.headlineSmall) }
+            item { Text(stringResource(R.string.report_drink_sales), style = MaterialTheme.typography.headlineSmall) }
             item {
                 Card(Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        drinkSales.forEach { (name, quantity) -> Text("$name: $quantity sold", style = MaterialTheme.typography.titleMedium) }
+                        drinkSales.forEach { (name, quantity) -> Text(stringResource(R.string.report_drink_sales_item, name, quantity), style = MaterialTheme.typography.titleMedium) }
                     }
                 }
             }
         }
         if (groupedOrders.isEmpty()) {
-            item { Text("No completed orders yet.", style = MaterialTheme.typography.titleLarge) }
+            item { Text(stringResource(R.string.report_no_completed_orders), style = MaterialTheme.typography.titleLarge) }
         } else {
             groupedOrders.forEach { (label, group) ->
                 item { Text(label, style = MaterialTheme.typography.headlineSmall) }
@@ -82,9 +88,9 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
 @Composable
 private fun OrderCard(order: Order) = Card(Modifier.fillMaxWidth()) {
     Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(formatDate(order.createdAt, "HH:mm"), style = MaterialTheme.typography.titleLarge)
-        order.items.forEach { Text("${it.quantity} × ${it.drinkName}", style = MaterialTheme.typography.bodyLarge) }
-        Text("Total: ${order.total} đ", style = MaterialTheme.typography.titleMedium)
+        Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
+        order.items.forEach { Text(stringResource(R.string.report_order_item, it.quantity, it.drinkName), style = MaterialTheme.typography.bodyLarge) }
+        Text(stringResource(R.string.label_total, stringResource(R.string.currency_vnd, order.total)), style = MaterialTheme.typography.titleMedium)
     }
 }
 

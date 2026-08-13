@@ -18,6 +18,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Settings
@@ -51,7 +53,7 @@ class MainActivity : ComponentActivity() {
                 var selectedTab by rememberSaveable { mutableStateOf(AppTab.SALE) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    topBar = { TopAppBar(title = { Text(selectedTab.title) }) },
+                    topBar = { TopAppBar(title = { Text(stringResource(selectedTab.titleRes)) }) },
                     bottomBar = { AppNavigationBar(selectedTab) { selectedTab = it } },
                 ) { padding ->
                     when (selectedTab) {
@@ -73,8 +75,8 @@ private fun AppNavigationBar(selectedTab: AppTab, onTabSelected: (AppTab) -> Uni
             NavigationBarItem(
                 selected = selectedTab == tab,
                 onClick = { onTabSelected(tab) },
-                icon = { Icon(tab.icon, contentDescription = tab.title) },
-                label = { Text(tab.navigationLabel) },
+                icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
+                label = { Text(stringResource(tab.navigationLabelRes)) },
             )
         }
     }
@@ -99,15 +101,15 @@ private class ReportsViewModelFactory(private val container: AppContainer) : Vie
 }
 
 private enum class AppTab(
-    val title: String,
-    val navigationLabel: String,
+    @StringRes val titleRes: Int,
+    @StringRes val navigationLabelRes: Int,
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
 ) {
-    SALE("Point of Sale", "Sale", Icons.Default.ShoppingCart),
-    CATALOG("Catalog & Inventory", "Catalog", Icons.Default.Storefront),
-    REPORTS("Orders & Reports", "Reports", Icons.Default.ReceiptLong),
-    SETTINGS("Settings", "Settings", Icons.Default.Settings),
+    SALE(R.string.tab_point_of_sale, R.string.tab_sale, Icons.Default.ShoppingCart),
+    CATALOG(R.string.tab_catalog_inventory, R.string.tab_catalog, Icons.Default.Storefront),
+    REPORTS(R.string.tab_orders_reports, R.string.tab_reports, Icons.Default.ReceiptLong),
+    SETTINGS(R.string.tab_settings, R.string.tab_settings, Icons.Default.Settings),
 }
 
 @Composable
-fun VPCoffeeAppPreview() = VPCoffeeTheme { Text("VPCoffee") }
+fun VPCoffeeAppPreview() = VPCoffeeTheme { Text(stringResource(R.string.app_name)) }
