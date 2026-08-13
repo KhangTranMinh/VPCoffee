@@ -108,7 +108,7 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
                 .padding(24.dp)
                 .height(64.dp),
             icon = { Icon(Icons.Default.Add, contentDescription = null) },
-            text = { Text(stringResource(R.string.action_add)) },
+            text = { Text(stringResource(R.string.action_add), style = MaterialTheme.typography.titleMedium) },
         )
     }
 

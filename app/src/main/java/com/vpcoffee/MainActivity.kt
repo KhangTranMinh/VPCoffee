@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -18,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -70,13 +72,13 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun AppNavigationBar(selectedTab: AppTab, onTabSelected: (AppTab) -> Unit) {
-    NavigationBar {
+    NavigationBar(modifier = Modifier.height(96.dp)) {
         AppTab.entries.forEach { tab ->
             NavigationBarItem(
                 selected = selectedTab == tab,
                 onClick = { onTabSelected(tab) },
                 icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
-                label = { Text(stringResource(tab.navigationLabelRes)) },
+                label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleMedium) },
             )
         }
     }
