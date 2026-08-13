@@ -135,6 +135,8 @@ private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = stringResource(R.string.catalog_delete_drink, drink.name),
+                    modifier = Modifier.size(32.dp),
+                    tint = MaterialTheme.colorScheme.error,
                 )
             }
         }
