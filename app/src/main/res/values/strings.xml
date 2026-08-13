@@ -50,7 +50,6 @@
     <string name="report_drink_sales_item">%1$s: %2$d sold</string>
     <string name="report_no_completed_orders">No completed orders yet.</string>
     <string name="report_order_item">%1$d × %2$s</string>
-    <string name="report_order_details">Order details</string>
     <string name="label_total">Total: %1$s</string>
     <string name="currency_vnd">%1$s đ</string>
     <string name="date_format_day">EEE, dd MMM yyyy</string>

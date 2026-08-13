@@ -132,7 +132,11 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
         tonalElevation = AlertDialogDefaults.TonalElevation,
     ) {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(stringResource(R.string.report_order_details), style = MaterialTheme.typography.displaySmall)
+            Text(
+                stringResource(R.string.label_total, formatVnd(order.total)),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     imageVector = Icons.Default.Schedule,
@@ -157,11 +161,6 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
                     )
                 }
             }
-            Text(
-                stringResource(R.string.label_total, formatVnd(order.total)),
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
             Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(64.dp)) {
                 Text(stringResource(R.string.action_ok), style = MaterialTheme.typography.titleMedium)
             }
