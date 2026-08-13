@@ -74,8 +74,10 @@ fun NotificationSettingsScreen(contentPadding: PaddingValues) {
         }
         Text("VPCoffee can read MoMo notifications aloud. Turn on notification access in Android settings to enable it.", style = MaterialTheme.typography.bodyLarge)
         Text("Speech can work while the screen is locked, but battery settings, audio use, and device restrictions may stop background speech.", style = MaterialTheme.typography.bodyLarge)
-        Button(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) {
-            Text("Open notification access settings")
+        if (!notificationAccessGranted) {
+            Button(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) {
+                Text("Open notification access settings")
+            }
         }
     }
 }
