@@ -166,7 +166,11 @@ private fun CartDialog(
                     DrinkImage(drinksById[item.drinkId]?.imageUri, Modifier.size(64.dp))
                     Column(Modifier.weight(1f).padding(start = 16.dp)) {
                         Text(item.drinkName, style = MaterialTheme.typography.titleMedium)
-                        Text(formatVnd(item.unitPrice * item.quantity), style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            formatVnd(item.unitPrice * item.quantity),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
                     }
                     IconButton(onClick = { onQuantityChange(item.drinkId, item.quantity - 1) }) {
                         Icon(Icons.Default.Remove, contentDescription = stringResource(R.string.sale_decrease_quantity), modifier = Modifier.size(28.dp))
