@@ -24,6 +24,8 @@ import com.vpcoffee.presentation.catalog.CatalogScreen
 import com.vpcoffee.presentation.catalog.CatalogViewModel
 import com.vpcoffee.presentation.pos.PointOfSaleScreen
 import com.vpcoffee.presentation.pos.PointOfSaleViewModel
+import com.vpcoffee.presentation.reports.ReportsScreen
+import com.vpcoffee.presentation.reports.ReportsViewModel
 import com.vpcoffee.ui.theme.VPCoffeeTheme
 
 class MainActivity : ComponentActivity() {
@@ -37,6 +39,7 @@ class MainActivity : ComponentActivity() {
             VPCoffeeTheme {
                 val catalogViewModel: CatalogViewModel = viewModel(factory = CatalogViewModelFactory(appContainer))
                 val pointOfSaleViewModel: PointOfSaleViewModel = viewModel(factory = PointOfSaleViewModelFactory(appContainer))
+                val reportsViewModel: ReportsViewModel = viewModel(factory = ReportsViewModelFactory(appContainer))
                 var selectedTab by rememberSaveable { mutableStateOf(AppTab.SALE) }
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -57,6 +60,7 @@ class MainActivity : ComponentActivity() {
                     when (selectedTab) {
                         AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
                         AppTab.CATALOG -> CatalogScreen(catalogViewModel, padding)
+                        AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding)
                     }
                 }
             }
@@ -77,9 +81,15 @@ private class PointOfSaleViewModelFactory(private val container: AppContainer) :
     ) as T
 }
 
+private class ReportsViewModelFactory(private val container: AppContainer) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T = ReportsViewModel(container.orderRepository) as T
+}
+
 private enum class AppTab(val title: String, val shortTitle: String) {
     SALE("Point of Sale", "Sale"),
     CATALOG("Catalog & Inventory", "Catalog"),
+    REPORTS("Orders & Reports", "Reports"),
 }
 
 @Composable
