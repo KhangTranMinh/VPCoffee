@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.content.FileProvider
 import com.vpcoffee.R
 import com.vpcoffee.core.ui.formatVnd
+import com.vpcoffee.core.ui.formatNumber
 import com.vpcoffee.feature.catalog.domain.model.Drink
 import com.vpcoffee.feature.catalog.data.image.cropImageToSquare
 import java.io.File
@@ -137,7 +138,7 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
     val context = androidx.compose.ui.platform.LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var name by remember(drink) { mutableStateOf(drink?.name.orEmpty()) }
-    var price by remember(drink) { mutableStateOf(drink?.price?.toString().orEmpty()) }
+    var price by remember(drink) { mutableStateOf(drink?.price?.let(::formatNumber).orEmpty()) }
     var imageUri by remember(drink) { mutableStateOf(drink?.imageUri) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> imageUri = uri?.toString() }
@@ -171,7 +172,9 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                 )
                 OutlinedTextField(
                     value = price,
-                    onValueChange = { price = it.filter(Char::isDigit) },
+                    onValueChange = { input ->
+                        price = input.filter(Char::isDigit).toLongOrNull()?.let(::formatNumber).orEmpty()
+                    },
                     label = { Text(stringResource(R.string.catalog_price_vnd)) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),

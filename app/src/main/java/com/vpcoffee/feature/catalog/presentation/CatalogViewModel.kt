@@ -15,7 +15,7 @@ class CatalogViewModel(private val drinkRepository: DrinkRepository) : ViewModel
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun saveDrink(id: String?, name: String, priceText: String, imageUri: String?) {
-        val price = priceText.toLongOrNull() ?: return
+        val price = priceText.filter(Char::isDigit).toLongOrNull() ?: return
         if (name.isBlank() || price < 0) return
         viewModelScope.launch {
             drinkRepository.saveDrink(Drink(id ?: UUID.randomUUID().toString(), name, price, imageUri))

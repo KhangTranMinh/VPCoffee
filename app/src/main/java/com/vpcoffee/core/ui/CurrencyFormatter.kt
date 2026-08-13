@@ -9,5 +9,7 @@ import java.util.Locale
 @Composable
 fun formatVnd(amount: Long): String = stringResource(
     R.string.currency_vnd,
-    NumberFormat.getNumberInstance(Locale.getDefault()).format(amount),
+    formatNumber(amount),
 )
+
+fun formatNumber(amount: Long): String = NumberFormat.getNumberInstance(Locale.getDefault()).format(amount)
