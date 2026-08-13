@@ -4,16 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -22,8 +18,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Storefront
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,20 +68,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun AppNavigationBar(selectedTab: AppTab, onTabSelected: (AppTab) -> Unit) {
-    Surface(shadowElevation = 4.dp) {
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            AppTab.entries.forEach { tab ->
-                FilterChip(
-                    selected = selectedTab == tab,
-                    onClick = { onTabSelected(tab) },
-                    label = { Text(tab.navigationLabel) },
-                )
-            }
+    NavigationBar {
+        AppTab.entries.forEach { tab ->
+            NavigationBarItem(
+                selected = selectedTab == tab,
+                onClick = { onTabSelected(tab) },
+                icon = { Icon(tab.icon, contentDescription = tab.title) },
+                label = { Text(tab.navigationLabel) },
+            )
         }
     }
 }
@@ -105,11 +98,15 @@ private class ReportsViewModelFactory(private val container: AppContainer) : Vie
     override fun <T : ViewModel> create(modelClass: Class<T>): T = ReportsViewModel(container.orderRepository) as T
 }
 
-private enum class AppTab(val title: String, val navigationLabel: String) {
-    SALE("Point of Sale", "Sale"),
-    CATALOG("Catalog & Inventory", "Catalog"),
-    REPORTS("Orders & Reports", "Reports"),
-    SETTINGS("Settings", "Settings"),
+private enum class AppTab(
+    val title: String,
+    val navigationLabel: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+) {
+    SALE("Point of Sale", "Sale", Icons.Default.ShoppingCart),
+    CATALOG("Catalog & Inventory", "Catalog", Icons.Default.Storefront),
+    REPORTS("Orders & Reports", "Reports", Icons.Default.ReceiptLong),
+    SETTINGS("Settings", "Settings", Icons.Default.Settings),
 }
 
 @Composable
