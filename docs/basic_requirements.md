@@ -36,6 +36,8 @@ This application supports an individual operating a very small coffee shop.
 ## Coding Rules
 
 - Follow Clean Architecture principles.
+- Follow Google Material Design guidelines for the app's visual design, components, and interaction patterns.
+- Design for older users: use larger text, support system font scaling, and maintain clear, easy-to-read typography.
 - Keep UI code separate from business logic.
 - Keep business logic independent of framework-specific UI code.
 - Organize data access, business logic, and presentation/UI concerns into clearly separated layers.
