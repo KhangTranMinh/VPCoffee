@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -73,8 +74,8 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
             ) { items(drinks, key = { it.id }) { drink -> DrinkCard(drink) { viewModel.addDrink(drink) } } }
         }
         if (cart.isNotEmpty()) {
-            Button(onClick = { showCart = true }, modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp)) {
-                Text(stringResource(R.string.sale_view_cart, cart.sumOf { it.quantity }, formatVnd(cart.sumOf { it.unitPrice * it.quantity })))
+            Button(onClick = { showCart = true }, modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp).height(64.dp)) {
+                Text(stringResource(R.string.sale_view_cart, cart.sumOf { it.quantity }, formatVnd(cart.sumOf { it.unitPrice * it.quantity })), style = MaterialTheme.typography.titleMedium)
             }
         }
     }
@@ -179,8 +180,8 @@ private fun CartDialog(
             }
             Row(Modifier.fillMaxWidth()) {
                 androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.sale_keep_shopping)) }
-                Button(onClick = onDone) { Text(stringResource(R.string.sale_done)) }
+                TextButton(onClick = onDismiss, modifier = Modifier.height(56.dp)) { Text(stringResource(R.string.sale_keep_shopping), style = MaterialTheme.typography.titleMedium) }
+                Button(onClick = onDone, modifier = Modifier.height(56.dp)) { Text(stringResource(R.string.sale_done), style = MaterialTheme.typography.titleMedium) }
             }
         }
     }

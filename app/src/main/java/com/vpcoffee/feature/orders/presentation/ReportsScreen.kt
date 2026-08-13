@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -62,7 +63,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Grouping.entries.forEach { option ->
                     val label = stringResource(option.labelRes)
-                    TextButton(onClick = { grouping = option }) { Text(if (grouping == option) stringResource(R.string.report_selected_grouping, label) else label) }
+                    TextButton(onClick = { grouping = option }, modifier = Modifier.height(56.dp)) { Text(if (grouping == option) stringResource(R.string.report_selected_grouping, label) else label, style = MaterialTheme.typography.titleMedium) }
                 }
             }
         }

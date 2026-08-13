@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -81,8 +82,11 @@ fun SettingsScreen(contentPadding: PaddingValues) {
         }
         if (!notificationAccessGranted) {
             Text(stringResource(R.string.settings_notification_access_instruction), style = MaterialTheme.typography.bodyLarge)
-            Button(onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) {
-                Text(stringResource(R.string.settings_open_notification_access))
+            Button(
+                onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
+                modifier = Modifier.height(64.dp),
+            ) {
+                Text(stringResource(R.string.settings_open_notification_access), style = MaterialTheme.typography.titleMedium)
             }
         }
     }

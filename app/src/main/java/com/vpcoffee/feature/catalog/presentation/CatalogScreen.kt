@@ -208,26 +208,26 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Button(onClick = { imagePicker.launch("image/*") }) {
+                Button(onClick = { imagePicker.launch("image/*") }, modifier = Modifier.fillMaxWidth().height(56.dp)) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.catalog_choose_square_image))
+                    Text(stringResource(R.string.catalog_choose_square_image), style = MaterialTheme.typography.titleMedium)
                 }
                 Button(onClick = {
                     createCameraImageUri(context).also { uri ->
                         cameraImageUri = uri
                         cameraLauncher.launch(uri)
                     }
-                }) {
+                }, modifier = Modifier.fillMaxWidth().height(56.dp)) {
                     Icon(Icons.Default.PhotoCamera, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.catalog_take_photo))
+                    Text(stringResource(R.string.catalog_take_photo), style = MaterialTheme.typography.titleMedium)
                 }
                 imageUri?.let { DrinkImage(it, Modifier.size(88.dp)) }
                 Row(Modifier.fillMaxWidth()) {
                     Spacer(Modifier.weight(1f))
-                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
-                    TextButton(onClick = { onSave(name, price.text, imageUri) }) { Text(stringResource(R.string.action_save)) }
+                    TextButton(onClick = onDismiss, modifier = Modifier.height(56.dp)) { Text(stringResource(R.string.action_cancel), style = MaterialTheme.typography.titleMedium) }
+                    Button(onClick = { onSave(name, price.text, imageUri) }, modifier = Modifier.height(56.dp)) { Text(stringResource(R.string.action_save), style = MaterialTheme.typography.titleMedium) }
                 }
             }
         }
