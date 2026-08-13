@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".data.notification.VPCoffeeNotificationListenerService"
+            android:name=".feature.notifications.data.VPCoffeeNotificationListenerService"
             android:exported="false"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">

@@ -40,4 +40,4 @@ This application supports an individual operating a very small coffee shop.
 - Design for older users: use larger text, support system font scaling, and maintain clear, easy-to-read typography.
 - Keep UI code separate from business logic.
 - Keep business logic independent of framework-specific UI code.
-- Organize data access, business logic, and presentation/UI concerns into clearly separated layers.
+- Organize code by feature first. Within each feature, keep data access, business logic, and presentation/UI concerns in clearly separated layers.

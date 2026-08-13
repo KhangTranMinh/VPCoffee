@@ -20,13 +20,14 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.vpcoffee.presentation.catalog.CatalogScreen
-import com.vpcoffee.presentation.catalog.CatalogViewModel
-import com.vpcoffee.presentation.pos.PointOfSaleScreen
-import com.vpcoffee.presentation.pos.PointOfSaleViewModel
-import com.vpcoffee.presentation.reports.ReportsScreen
-import com.vpcoffee.presentation.reports.ReportsViewModel
-import com.vpcoffee.presentation.settings.NotificationSettingsScreen
+import com.vpcoffee.core.di.AppContainer
+import com.vpcoffee.feature.catalog.presentation.CatalogScreen
+import com.vpcoffee.feature.catalog.presentation.CatalogViewModel
+import com.vpcoffee.feature.notifications.presentation.NotificationSettingsScreen
+import com.vpcoffee.feature.orders.presentation.ReportsScreen
+import com.vpcoffee.feature.orders.presentation.ReportsViewModel
+import com.vpcoffee.feature.sales.presentation.PointOfSaleScreen
+import com.vpcoffee.feature.sales.presentation.PointOfSaleViewModel
 import com.vpcoffee.ui.theme.VPCoffeeTheme
 
 class MainActivity : ComponentActivity() {
