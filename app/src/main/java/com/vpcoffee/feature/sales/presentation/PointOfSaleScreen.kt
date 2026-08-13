@@ -116,10 +116,10 @@ private fun OrderSavedDialog(onDismiss: () -> Unit) = Dialog(
                     )
                 }
             }
-            Text(stringResource(R.string.sale_order_saved), style = MaterialTheme.typography.headlineSmall)
             Text(
-                stringResource(R.string.sale_order_saved_message),
-                style = MaterialTheme.typography.bodyLarge,
+                stringResource(R.string.sale_order_saved),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
                 textAlign = TextAlign.Center,
             )
             Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(64.dp)) {
