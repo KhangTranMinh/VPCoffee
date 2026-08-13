@@ -78,7 +78,7 @@ private fun AppNavigationBar(selectedTab: AppTab, onTabSelected: (AppTab) -> Uni
                 selected = selectedTab == tab,
                 onClick = { onTabSelected(tab) },
                 icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
-                label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleMedium) },
+                label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) },
             )
         }
     }
