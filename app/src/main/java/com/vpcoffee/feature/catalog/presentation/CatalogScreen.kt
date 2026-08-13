@@ -51,6 +51,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Delete
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.content.FileProvider
 import com.vpcoffee.R
@@ -130,7 +131,12 @@ private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
                 Text(drink.name, style = MaterialTheme.typography.titleLarge)
                 Text(formatVnd(drink.price), style = MaterialTheme.typography.titleMedium)
             }
-            IconButton(onClick = onDelete) { Text(stringResource(R.string.action_delete)) }
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.catalog_delete_drink, drink.name),
+                )
+            }
         }
     }
 }

@@ -18,6 +18,7 @@
     <string name="catalog_add_first_drink">Add your first drink to start taking orders.</string>
     <string name="action_add">Add</string>
     <string name="action_delete">Delete</string>
+    <string name="catalog_delete_drink">Delete %1$s</string>
     <string name="catalog_add_drink">Add drink</string>
     <string name="catalog_edit_drink">Edit drink</string>
     <string name="catalog_drink_name">Drink name</string>
