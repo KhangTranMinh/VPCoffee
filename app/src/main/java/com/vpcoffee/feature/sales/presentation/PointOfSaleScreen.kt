@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -23,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,6 +34,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vpcoffee.R
@@ -39,6 +43,8 @@ import com.vpcoffee.core.ui.formatVnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddShoppingCart
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
 import com.vpcoffee.feature.catalog.domain.model.Drink
 import com.vpcoffee.feature.orders.domain.model.OrderItem
 
@@ -69,7 +75,7 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
             }
         }
     }
-    if (showCart) CartDialog(cart, { id, quantity -> viewModel.changeQuantity(id, quantity) }, onDismiss = { showCart = false }) {
+    if (showCart) CartDialog(cart, drinks, { id, quantity -> viewModel.changeQuantity(id, quantity) }, onDismiss = { showCart = false }) {
         viewModel.completeOrder { showCart = false; completedMessage = true }
     }
     if (completedMessage) AlertDialog(onDismissRequest = { completedMessage = false }, title = { Text(stringResource(R.string.sale_order_saved)) }, text = { Text(stringResource(R.string.sale_order_saved_message)) }, confirmButton = { TextButton(onClick = { completedMessage = false }) { Text(stringResource(R.string.action_ok)) } })
@@ -95,9 +101,9 @@ private fun DrinkCard(drink: Drink, onClick: () -> Unit) = Card(
 }
 
 @Composable
-private fun DrinkImage(uri: String?, modifier: Modifier, onClick: () -> Unit) {
+private fun DrinkImage(uri: String?, modifier: Modifier, onClick: (() -> Unit)? = null) {
     if (uri == null) {
-        Box(modifier.clickable(onClick = onClick), contentAlignment = Alignment.Center) {
+        Box(if (onClick == null) modifier else modifier.clickable(onClick = onClick), contentAlignment = Alignment.Center) {
             Icon(Icons.Default.Image, contentDescription = stringResource(R.string.sale_drink_image), modifier = Modifier.size(48.dp))
         }
     } else {
@@ -106,7 +112,7 @@ private fun DrinkImage(uri: String?, modifier: Modifier, onClick: () -> Unit) {
             factory = { context ->
                 ImageView(context).apply {
                     scaleType = ImageView.ScaleType.CENTER_CROP
-                    setOnClickListener { onClick() }
+                    onClick?.let { clickListener -> setOnClickListener { clickListener() } }
                 }
             },
             update = { it.setImageURI(android.net.Uri.parse(uri)) },
@@ -115,22 +121,46 @@ private fun DrinkImage(uri: String?, modifier: Modifier, onClick: () -> Unit) {
 }
 
 @Composable
-private fun CartDialog(items: List<OrderItem>, onQuantityChange: (String, Int) -> Unit, onDismiss: () -> Unit, onDone: () -> Unit) = AlertDialog(
+private fun CartDialog(
+    items: List<OrderItem>,
+    drinks: List<Drink>,
+    onQuantityChange: (String, Int) -> Unit,
+    onDismiss: () -> Unit,
+    onDone: () -> Unit,
+) = Dialog(
     onDismissRequest = onDismiss,
-    title = { Text(stringResource(R.string.sale_your_cart)) },
-    text = {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+) {
+    val drinksById = drinks.associateBy { it.id }
+    androidx.compose.material3.Surface(
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
+        shape = AlertDialogDefaults.shape,
+        tonalElevation = AlertDialogDefaults.TonalElevation,
+    ) {
+        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(stringResource(R.string.sale_your_cart), style = MaterialTheme.typography.headlineSmall)
             items.forEach { item ->
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) { Text(item.drinkName, style = MaterialTheme.typography.titleMedium); Text(formatVnd(item.unitPrice * item.quantity)) }
-                    TextButton(onClick = { onQuantityChange(item.drinkId, item.quantity - 1) }) { Text(stringResource(R.string.sale_decrease_quantity)) }
+                    DrinkImage(drinksById[item.drinkId]?.imageUri, Modifier.size(64.dp))
+                    Column(Modifier.weight(1f).padding(start = 16.dp)) {
+                        Text(item.drinkName, style = MaterialTheme.typography.titleMedium)
+                        Text(formatVnd(item.unitPrice * item.quantity), style = MaterialTheme.typography.bodyLarge)
+                    }
+                    IconButton(onClick = { onQuantityChange(item.drinkId, item.quantity - 1) }) {
+                        Icon(Icons.Default.Remove, contentDescription = stringResource(R.string.sale_decrease_quantity), modifier = Modifier.size(28.dp))
+                    }
                     Text("${item.quantity}", style = MaterialTheme.typography.titleLarge)
-                    TextButton(onClick = { onQuantityChange(item.drinkId, item.quantity + 1) }) { Text(stringResource(R.string.sale_increase_quantity)) }
+                    IconButton(onClick = { onQuantityChange(item.drinkId, item.quantity + 1) }) {
+                        Icon(Icons.Default.Add, contentDescription = stringResource(R.string.sale_increase_quantity), modifier = Modifier.size(28.dp))
+                    }
                 }
             }
             Text(stringResource(R.string.label_total, formatVnd(items.sumOf { it.unitPrice * it.quantity })), style = MaterialTheme.typography.titleLarge)
+            Row(Modifier.fillMaxWidth()) {
+                androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                TextButton(onClick = onDismiss) { Text(stringResource(R.string.sale_keep_shopping)) }
+                Button(onClick = onDone) { Text(stringResource(R.string.sale_done)) }
+            }
         }
-    },
-    confirmButton = { Button(onClick = onDone) { Text(stringResource(R.string.sale_done)) } },
-    dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.sale_keep_shopping)) } },
-)
+    }
+}
