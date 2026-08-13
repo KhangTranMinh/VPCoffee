@@ -9,9 +9,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items as lazyItems
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -132,14 +135,34 @@ private fun CartDialog(
     properties = DialogProperties(usePlatformDefaultWidth = false),
 ) {
     val drinksById = drinks.associateBy { it.id }
+    val total = items.sumOf { it.unitPrice * it.quantity }
     androidx.compose.material3.Surface(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
         shape = AlertDialogDefaults.shape,
         tonalElevation = AlertDialogDefaults.TonalElevation,
     ) {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(stringResource(R.string.sale_your_cart), style = MaterialTheme.typography.headlineSmall)
-            items.forEach { item ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.AddShoppingCart,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Column(Modifier.padding(start = 12.dp)) {
+                    Text(stringResource(R.string.sale_your_cart), style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        formatVnd(total),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
+            }
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                lazyItems(items, key = { it.drinkId }) { item ->
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     DrinkImage(drinksById[item.drinkId]?.imageUri, Modifier.size(64.dp))
                     Column(Modifier.weight(1f).padding(start = 16.dp)) {
@@ -154,8 +177,8 @@ private fun CartDialog(
                         Icon(Icons.Default.Add, contentDescription = stringResource(R.string.sale_increase_quantity), modifier = Modifier.size(28.dp))
                     }
                 }
+                }
             }
-            Text(stringResource(R.string.label_total, formatVnd(items.sumOf { it.unitPrice * it.quantity })), style = MaterialTheme.typography.titleLarge)
             Row(Modifier.fillMaxWidth()) {
                 androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
                 TextButton(onClick = onDismiss) { Text(stringResource(R.string.sale_keep_shopping)) }
