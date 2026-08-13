@@ -8,20 +8,21 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class CatalogViewModel(private val drinkRepository: DrinkRepository) : ViewModel() {
     val drinks: StateFlow<List<Drink>> = drinkRepository.observeDrinks()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun saveDrink(id: Long, name: String, priceText: String, imageUri: String?) {
+    fun saveDrink(id: String?, name: String, priceText: String, imageUri: String?) {
         val price = priceText.toLongOrNull() ?: return
         if (name.isBlank() || price < 0) return
         viewModelScope.launch {
-            drinkRepository.saveDrink(Drink(id, name, price, imageUri))
+            drinkRepository.saveDrink(Drink(id ?: UUID.randomUUID().toString(), name, price, imageUri))
         }
     }
 
-    fun deleteDrink(id: Long) {
+    fun deleteDrink(id: String) {
         viewModelScope.launch { drinkRepository.deleteDrink(id) }
     }
 }

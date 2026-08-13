@@ -10,14 +10,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "orders")
 data class OrderEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: String,
     val createdAt: Long,
 )
 
 @Entity(tableName = "order_items", primaryKeys = ["orderId", "drinkId"])
 data class OrderItemEntity(
-    val orderId: Long,
-    val drinkId: Long,
+    val orderId: String,
+    val drinkId: String,
     val drinkName: String,
     val unitPrice: Long,
     val quantity: Int,

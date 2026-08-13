@@ -74,7 +74,7 @@ private fun DrinkCard(drink: Drink, onClick: () -> Unit) = Card(
 }
 
 @Composable
-private fun CartDialog(items: List<OrderItem>, onQuantityChange: (Long, Int) -> Unit, onDismiss: () -> Unit, onDone: () -> Unit) = AlertDialog(
+private fun CartDialog(items: List<OrderItem>, onQuantityChange: (String, Int) -> Unit, onDismiss: () -> Unit, onDone: () -> Unit) = AlertDialog(
     onDismissRequest = onDismiss,
     title = { Text("Your cart") },
     text = {

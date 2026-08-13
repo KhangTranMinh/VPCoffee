@@ -12,9 +12,12 @@ class DrinkRepositoryImpl(private val drinkDao: DrinkDao) : DrinkRepository {
         drinks.map { it.toDomain() }
     }
 
-    override suspend fun saveDrink(drink: Drink): Long = drinkDao.upsert(drink.toEntity())
+    override suspend fun saveDrink(drink: Drink): String {
+        drinkDao.upsert(drink.toEntity())
+        return drink.id
+    }
 
-    override suspend fun deleteDrink(id: Long) = drinkDao.delete(id)
+    override suspend fun deleteDrink(id: String) = drinkDao.delete(id)
 }
 
 private fun DrinkEntity.toDomain() = Drink(id, name, price, imageUri)

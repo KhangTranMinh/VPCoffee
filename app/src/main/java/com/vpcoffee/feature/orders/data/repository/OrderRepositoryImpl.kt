@@ -27,11 +27,11 @@ class OrderRepositoryImpl(
         }
     }
 
-    override suspend fun saveOrder(order: Order): Long = database.withTransaction {
-        val orderId = orderDao.upsertOrder(OrderEntity(order.id, order.createdAt))
+    override suspend fun saveOrder(order: Order): String = database.withTransaction {
+        orderDao.upsertOrder(OrderEntity(order.id, order.createdAt))
         orderDao.upsertItems(order.items.map { item ->
-            OrderItemEntity(orderId, item.drinkId, item.drinkName, item.unitPrice, item.quantity)
+            OrderItemEntity(order.id, item.drinkId, item.drinkName, item.unitPrice, item.quantity)
         })
-        orderId
+        order.id
     }
 }

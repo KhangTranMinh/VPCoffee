@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class PointOfSaleViewModel(
     drinkRepository: DrinkRepository,
@@ -32,7 +33,7 @@ class PointOfSaleViewModel(
         }
     }
 
-    fun changeQuantity(drinkId: Long, quantity: Int) {
+    fun changeQuantity(drinkId: String, quantity: Int) {
         _cart.value = _cart.value.mapNotNull { item ->
             when {
                 item.drinkId != drinkId -> item
@@ -46,7 +47,7 @@ class PointOfSaleViewModel(
         val items = _cart.value
         if (items.isEmpty()) return
         viewModelScope.launch {
-            orderRepository.saveOrder(Order(createdAt = System.currentTimeMillis(), items = items))
+            orderRepository.saveOrder(Order(id = UUID.randomUUID().toString(), createdAt = System.currentTimeMillis(), items = items))
             _cart.value = emptyList()
             onComplete()
         }

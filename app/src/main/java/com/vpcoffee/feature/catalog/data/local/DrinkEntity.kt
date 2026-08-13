@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Entity(tableName = "drinks")
 data class DrinkEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @PrimaryKey val id: String,
     val name: String,
     val price: Long,
     val imageUri: String?,
@@ -24,5 +24,5 @@ interface DrinkDao {
     suspend fun upsert(drink: DrinkEntity): Long
 
     @Query("DELETE FROM drinks WHERE id = :id")
-    suspend fun delete(id: Long)
+    suspend fun delete(id: String)
 }

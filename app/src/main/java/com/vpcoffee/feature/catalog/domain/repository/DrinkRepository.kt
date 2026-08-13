@@ -5,6 +5,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface DrinkRepository {
     fun observeDrinks(): Flow<List<Drink>>
-    suspend fun saveDrink(drink: Drink): Long
-    suspend fun deleteDrink(id: Long)
+    suspend fun saveDrink(drink: Drink): String
+    suspend fun deleteDrink(id: String)
 }

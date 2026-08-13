@@ -1,7 +1,7 @@
 package com.vpcoffee.feature.orders.domain.model
 
 data class Order(
-    val id: Long = 0,
+    val id: String,
     val createdAt: Long,
     val items: List<OrderItem>,
 ) {
@@ -9,7 +9,7 @@ data class Order(
 }
 
 data class OrderItem(
-    val drinkId: Long,
+    val drinkId: String,
     val drinkName: String,
     val unitPrice: Long,
     val quantity: Int,

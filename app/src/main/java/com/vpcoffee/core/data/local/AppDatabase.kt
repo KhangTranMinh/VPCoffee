@@ -10,7 +10,7 @@ import com.vpcoffee.feature.orders.data.local.OrderItemEntity
 
 @Database(
     entities = [DrinkEntity::class, OrderEntity::class, OrderItemEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false,
 )
 abstract class AppDatabase : RoomDatabase() {

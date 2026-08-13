@@ -79,7 +79,7 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
     }
 
     if (showAddDialog) DrinkEditorDialog(onDismiss = { showAddDialog = false }) { name, price, image ->
-        viewModel.saveDrink(0, name, price, image)
+        viewModel.saveDrink(null, name, price, image)
         showAddDialog = false
     }
     editingDrink?.let { drink ->
