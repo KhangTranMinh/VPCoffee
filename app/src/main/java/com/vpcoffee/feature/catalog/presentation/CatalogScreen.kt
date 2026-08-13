@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,18 +34,26 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.content.FileProvider
 import com.vpcoffee.R
 import com.vpcoffee.core.ui.formatVnd
 import com.vpcoffee.feature.catalog.domain.model.Drink
+import com.vpcoffee.feature.catalog.data.image.cropImageToSquare
 import java.io.File
 import java.util.UUID
+import kotlinx.coroutines.launch
 
 @Composable
 fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
@@ -122,21 +131,48 @@ private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
 @Composable
 private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSave: (String, String, String?) -> Unit) {
     val context = androidx.compose.ui.platform.LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var name by remember(drink) { mutableStateOf(drink?.name.orEmpty()) }
     var price by remember(drink) { mutableStateOf(drink?.price?.toString().orEmpty()) }
     var imageUri by remember(drink) { mutableStateOf(drink?.imageUri) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri -> imageUri = uri?.toString() }
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { isSaved ->
-        if (isSaved) imageUri = cameraImageUri?.toString()
+        cameraImageUri?.let { uri ->
+            if (isSaved) {
+                coroutineScope.launch {
+                    if (cropImageToSquare(context, uri)) imageUri = uri.toString()
+                }
+            }
+        }
     }
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(if (drink == null) R.string.catalog_add_drink else R.string.catalog_edit_drink)) },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(name, { name = it }, label = { Text(stringResource(R.string.catalog_drink_name)) }, singleLine = true)
-                OutlinedTextField(price, { price = it }, label = { Text(stringResource(R.string.catalog_price_vnd)) }, singleLine = true)
+        properties = DialogProperties(usePlatformDefaultWidth = false),
+    ) {
+        androidx.compose.material3.Surface(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            shape = AlertDialogDefaults.shape,
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+        ) {
+            Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(if (drink == null) R.string.catalog_add_drink else R.string.catalog_edit_drink), style = MaterialTheme.typography.headlineSmall)
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text(stringResource(R.string.catalog_drink_name)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { price = it.filter(Char::isDigit) },
+                    label = { Text(stringResource(R.string.catalog_price_vnd)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth(),
+                )
                 Button(onClick = { imagePicker.launch("image/*") }) { Text(stringResource(R.string.catalog_choose_square_image)) }
                 Button(onClick = {
                     createCameraImageUri(context).also { uri ->
@@ -145,11 +181,14 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                     }
                 }) { Text(stringResource(R.string.catalog_take_photo)) }
                 imageUri?.let { DrinkImage(it, Modifier.size(88.dp)) }
+                Row(Modifier.fillMaxWidth()) {
+                    Spacer(Modifier.weight(1f))
+                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+                    TextButton(onClick = { onSave(name, price, imageUri) }) { Text(stringResource(R.string.action_save)) }
+                }
             }
-        },
-        confirmButton = { TextButton(onClick = { onSave(name, price, imageUri) }) { Text(stringResource(R.string.action_save)) } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
-    )
+        }
+    }
 }
 
 private fun createCameraImageUri(context: Context): Uri {
