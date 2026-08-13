@@ -3,16 +3,15 @@ package com.vpcoffee.feature.orders.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,20 +49,27 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
+            TabRow(selectedTabIndex = Grouping.entries.indexOf(grouping)) {
+                Grouping.entries.forEach { option ->
+                    Tab(
+                        selected = grouping == option,
+                        onClick = { grouping = option },
+                        text = {
+                            Text(
+                                stringResource(option.labelRes),
+                                style = MaterialTheme.typography.titleLarge,
+                            )
+                        },
+                    )
+                }
+            }
+        }
+        item {
             Card(Modifier.fillMaxWidth()) {
                 Column(Modifier.padding(20.dp)) {
                     Text(stringResource(R.string.report_total_income), style = MaterialTheme.typography.titleLarge)
                     Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
                     Text(pluralStringResource(R.plurals.report_completed_orders, orders.size, orders.size), style = MaterialTheme.typography.bodyLarge)
-                }
-            }
-        }
-        item {
-            Text(stringResource(R.string.report_group_orders_by), style = MaterialTheme.typography.titleLarge)
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Grouping.entries.forEach { option ->
-                    val label = stringResource(option.labelRes)
-                    TextButton(onClick = { grouping = option }, modifier = Modifier.height(56.dp)) { Text(if (grouping == option) stringResource(R.string.report_selected_grouping, label) else label, style = MaterialTheme.typography.titleMedium) }
                 }
             }
         }

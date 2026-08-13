@@ -42,11 +42,9 @@
     <string name="sale_keep_shopping">Keep shopping</string>
     <string name="report_total_income">Total income</string>
     <plurals name="report_completed_orders"><item quantity="one">%1$d completed order</item><item quantity="other">%1$d completed orders</item></plurals>
-    <string name="report_group_orders_by">Group orders by</string>
     <string name="report_day">Day</string>
     <string name="report_week">Week</string>
     <string name="report_month">Month</string>
-    <string name="report_selected_grouping">• %1$s</string>
     <string name="report_drink_sales">Drink sales</string>
     <string name="report_drink_sales_item">%1$s: %2$d sold</string>
     <string name="report_no_completed_orders">No completed orders yet.</string>
