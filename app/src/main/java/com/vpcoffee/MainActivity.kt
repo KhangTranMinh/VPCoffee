@@ -26,6 +26,7 @@ import com.vpcoffee.presentation.pos.PointOfSaleScreen
 import com.vpcoffee.presentation.pos.PointOfSaleViewModel
 import com.vpcoffee.presentation.reports.ReportsScreen
 import com.vpcoffee.presentation.reports.ReportsViewModel
+import com.vpcoffee.presentation.settings.NotificationSettingsScreen
 import com.vpcoffee.ui.theme.VPCoffeeTheme
 
 class MainActivity : ComponentActivity() {
@@ -61,6 +62,7 @@ class MainActivity : ComponentActivity() {
                         AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
                         AppTab.CATALOG -> CatalogScreen(catalogViewModel, padding)
                         AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding)
+                        AppTab.SETTINGS -> NotificationSettingsScreen(padding)
                     }
                 }
             }
@@ -90,6 +92,7 @@ private enum class AppTab(val title: String, val shortTitle: String) {
     SALE("Point of Sale", "Sale"),
     CATALOG("Catalog & Inventory", "Catalog"),
     REPORTS("Orders & Reports", "Reports"),
+    SETTINGS("Settings", "Settings"),
 }
 
 @Composable
