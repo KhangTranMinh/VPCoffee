@@ -115,10 +115,26 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
 
 @Composable
 private fun OrderCard(order: Order, onClick: () -> Unit) = Card(Modifier.fillMaxWidth().clickable(onClick = onClick)) {
-    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(formatDate(order.createdAt, stringResource(R.string.date_format_time)), style = MaterialTheme.typography.titleLarge)
+    Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         val itemCount = order.items.sumOf { it.quantity }
-        Text(pluralStringResource(R.plurals.report_order_items, itemCount, itemCount), style = MaterialTheme.typography.bodyLarge)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Default.Schedule,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.size(6.dp))
+            Text(
+                formatDate(order.createdAt, stringResource(R.string.date_format_time)),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                pluralStringResource(R.plurals.report_order_items, itemCount, itemCount),
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
         Text(stringResource(R.string.label_total, formatVnd(order.total)), style = MaterialTheme.typography.titleMedium)
     }
 }
