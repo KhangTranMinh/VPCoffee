@@ -142,7 +142,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
     if (showDrinkSales) {
         DrinkSalesDialog(
             drinkSales,
-            periodLabel = stringResource(period.labelRes),
+            period = period,
             onDismiss = { showDrinkSales = false },
         )
     }
@@ -241,7 +241,7 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
 @Composable
 private fun DrinkSalesDialog(
     drinkSales: List<Pair<String, Int>>,
-    periodLabel: String,
+    period: ReportPeriod,
     onDismiss: () -> Unit,
 ) = Dialog(
     onDismissRequest = onDismiss,
@@ -269,7 +269,7 @@ private fun DrinkSalesDialog(
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(
-                    formatDate(System.currentTimeMillis(), stringResource(R.string.date_format_day)),
+                    formatPeriodDate(period),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
@@ -300,6 +300,22 @@ private fun DrinkSalesDialog(
 
 private fun formatDate(timestamp: Long, pattern: String): String =
     SimpleDateFormat(pattern, Locale.getDefault()).format(Date(timestamp))
+
+private fun formatPeriodDate(period: ReportPeriod): String {
+    val cal = Calendar.getInstance()
+    return when (period) {
+        ReportPeriod.DAY -> formatDate(cal.timeInMillis, "EEE, dd MMM yyyy")
+        ReportPeriod.WEEK -> {
+            val start = cal.clone() as Calendar
+            start.set(Calendar.DAY_OF_WEEK, start.firstDayOfWeek)
+            val end = cal.clone() as Calendar
+            end.set(Calendar.DAY_OF_WEEK, end.firstDayOfWeek)
+            end.add(Calendar.DAY_OF_WEEK, 6)
+            "${formatDate(start.timeInMillis, "dd MMM")} - ${formatDate(end.timeInMillis, "dd MMM yyyy")}"
+        }
+        ReportPeriod.MONTH -> formatDate(cal.timeInMillis, "MMM yyyy")
+    }
+}
 
 private fun Order.isInPeriod(period: ReportPeriod): Boolean {
     val now = Calendar.getInstance()
