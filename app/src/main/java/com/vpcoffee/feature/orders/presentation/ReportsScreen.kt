@@ -260,7 +260,7 @@ private fun DrinkSalesDialog(
                 color = MaterialTheme.colorScheme.primary,
             )
             Text(
-                periodLabel + " — " + formatDate(System.currentTimeMillis(), stringResource(R.string.date_format_day)),
+                formatDate(System.currentTimeMillis(), stringResource(R.string.date_format_day)),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
