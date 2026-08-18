@@ -41,7 +41,7 @@
     <string name="sale_done">Done</string>
     <string name="sale_keep_shopping">Keep shopping</string>
     <string name="report_total_income">Total income</string>
-    <plurals name="report_completed_orders"><item quantity="one">%1$d completed order</item><item quantity="other">%1$d completed orders</item></plurals>
+    <plurals name="report_completed_orders"><item quantity="one">%1$d order</item><item quantity="other">%1$d orders</item></plurals>
     <plurals name="report_order_items"><item quantity="one">%1$d item</item><item quantity="other">%1$d items</item></plurals>
     <string name="report_day">Day</string>
     <string name="report_week">Week</string>

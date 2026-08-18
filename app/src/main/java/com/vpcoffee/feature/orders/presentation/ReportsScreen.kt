@@ -96,15 +96,18 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
                     Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    Text(
-                        stringResource(R.string.report_total_income) + " (" + pluralStringResource(
-                            R.plurals.report_completed_orders,
-                            periodOrders.size,
-                            periodOrders.size
-                        ) + ")",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            stringResource(R.string.report_total_income) + " (" + pluralStringResource(
+                                R.plurals.report_completed_orders,
+                                periodOrders.size,
+                                periodOrders.size
+                            ) + ")",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(Modifier.weight(1f))
+                        Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
+                    }
                 }
             }
         }

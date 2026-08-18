@@ -41,7 +41,7 @@
     <string name="sale_done">Xong</string>
     <string name="sale_keep_shopping">Tiếp tục mua</string>
     <string name="report_total_income">Tổng thu nhập</string>
-    <plurals name="report_completed_orders"><item quantity="other">%1$d đơn hoàn thành</item></plurals>
+    <plurals name="report_completed_orders"><item quantity="other">%1$d đơn</item></plurals>
     <plurals name="report_order_items"><item quantity="other">%1$d món</item></plurals>
     <string name="report_day">Ngày</string>
     <string name="report_week">Tuần</string>
