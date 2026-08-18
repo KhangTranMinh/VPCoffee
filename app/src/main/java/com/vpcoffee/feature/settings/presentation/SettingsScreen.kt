@@ -86,7 +86,7 @@ fun SettingsScreen(contentPadding: PaddingValues) {
                 onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
                 modifier = Modifier.height(64.dp),
             ) {
-                Text(stringResource(R.string.settings_open_notification_access), style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.settings_grant_access), style = MaterialTheme.typography.titleMedium)
             }
         }
     }

@@ -97,15 +97,24 @@ private fun ShakeDetector(onShake: () -> Unit) {
     DisposableEffect(Unit) {
         val listener = object : SensorEventListener {
             private var lastShakeTime = 0L
+            private var shakeCount = 0
+            private var lastShakeDetectedTime = 0L
             override fun onSensorChanged(event: SensorEvent) {
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2]
                 val magnitude = sqrt((x * x + y * y + z * z).toDouble()) - SensorManager.GRAVITY_EARTH
-                if (magnitude > 15.0) {
-                    val now = System.currentTimeMillis()
-                    if (now - lastShakeTime > 1500) {
+                val now = System.currentTimeMillis()
+                if (magnitude > 25.0) {
+                    if (now - lastShakeDetectedTime < 500) {
+                        shakeCount++
+                    } else {
+                        shakeCount = 1
+                    }
+                    lastShakeDetectedTime = now
+                    if (shakeCount >= 3 && now - lastShakeTime > 2000) {
                         lastShakeTime = now
+                        shakeCount = 0
                         onShake()
                     }
                 }
