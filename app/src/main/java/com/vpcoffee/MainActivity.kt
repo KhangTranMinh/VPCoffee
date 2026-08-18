@@ -4,10 +4,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -16,9 +27,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.annotation.StringRes
@@ -33,6 +47,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vpcoffee.core.di.AppContainer
 import com.vpcoffee.feature.catalog.presentation.CatalogScreen
 import com.vpcoffee.feature.catalog.presentation.CatalogViewModel
+import com.vpcoffee.feature.debug.presentation.DebugLogScreen
+import com.vpcoffee.feature.debug.presentation.DebugLogViewModel
 import com.vpcoffee.feature.settings.presentation.SettingsScreen
 import com.vpcoffee.feature.orders.presentation.ReportsScreen
 import com.vpcoffee.feature.orders.presentation.ReportsViewModel
@@ -53,16 +69,28 @@ class MainActivity : ComponentActivity() {
                 val pointOfSaleViewModel: PointOfSaleViewModel = viewModel(factory = PointOfSaleViewModelFactory(appContainer))
                 val reportsViewModel: ReportsViewModel = viewModel(factory = ReportsViewModelFactory(appContainer))
                 var selectedTab by rememberSaveable { mutableStateOf(AppTab.SALE) }
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    topBar = { TopAppBar(title = { Text(stringResource(selectedTab.titleRes)) }) },
-                    bottomBar = { AppNavigationBar(selectedTab) { selectedTab = it } },
-                ) { padding ->
-                    when (selectedTab) {
-                        AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
-                        AppTab.CATALOG -> CatalogScreen(catalogViewModel, padding)
-                        AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding)
-                        AppTab.SETTINGS -> SettingsScreen(padding)
+                var showDebugLog by remember { mutableStateOf(false) }
+
+                if (showDebugLog) {
+                    val debugLogViewModel: DebugLogViewModel = viewModel()
+                    DebugLogScreen(debugLogViewModel) { showDebugLog = false }
+                } else {
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        topBar = { TopAppBar(title = { Text(stringResource(selectedTab.titleRes)) }) },
+                        bottomBar = {
+                            AppNavigationBar(selectedTab,
+                                onTabSelected = { selectedTab = it },
+                                onSettingsLongClick = { showDebugLog = true },
+                            )
+                        },
+                    ) { padding ->
+                        when (selectedTab) {
+                            AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
+                            AppTab.CATALOG -> CatalogScreen(catalogViewModel, padding)
+                            AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding)
+                            AppTab.SETTINGS -> SettingsScreen(padding)
+                        }
                     }
                 }
             }
@@ -70,16 +98,74 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun AppNavigationBar(selectedTab: AppTab, onTabSelected: (AppTab) -> Unit) {
+private fun RowScope.SettingsNavigationBarItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    haptic: androidx.compose.ui.hapticfeedback.HapticFeedback,
+) {
+    val colorScheme = MaterialTheme.colorScheme
+    val iconColor = if (selected) colorScheme.onSurface else colorScheme.onSurfaceVariant
+    val textColor = if (selected) colorScheme.onSurface else colorScheme.onSurfaceVariant
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .height(80.dp)
+            .combinedClickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick,
+                onLongClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    onLongClick()
+                },
+            )
+            .padding(top = 12.dp),
+        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Box {
+            Icon(
+                Icons.Default.Settings,
+                contentDescription = stringResource(R.string.tab_settings),
+                tint = iconColor,
+            )
+        }
+        Text(
+            stringResource(R.string.tab_settings),
+            style = androidx.compose.material3.MaterialTheme.typography.titleSmall,
+            color = textColor,
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AppNavigationBar(
+    selectedTab: AppTab,
+    onTabSelected: (AppTab) -> Unit,
+    onSettingsLongClick: () -> Unit,
+) {
+    val haptic = LocalHapticFeedback.current
     NavigationBar(modifier = Modifier.height(96.dp)) {
         AppTab.entries.forEach { tab ->
-            NavigationBarItem(
-                selected = selectedTab == tab,
-                onClick = { onTabSelected(tab) },
-                icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
-                label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) },
-            )
+            if (tab == AppTab.SETTINGS) {
+                SettingsNavigationBarItem(
+                    selected = selectedTab == tab,
+                    onClick = { onTabSelected(tab) },
+                    onLongClick = onSettingsLongClick,
+                    haptic = haptic,
+                )
+            } else {
+                NavigationBarItem(
+                    selected = selectedTab == tab,
+                    onClick = { onTabSelected(tab) },
+                    icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
+                    label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) },
+                )
+            }
         }
     }
 }

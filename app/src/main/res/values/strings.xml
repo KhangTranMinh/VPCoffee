@@ -55,4 +55,9 @@
     <string name="date_format_day">EEE, dd MMM yyyy</string>
     <string name="date_format_time">HH:mm</string>
     <string name="date_format_order_details">dd/MM/yyyy - HH:mm</string>
+    <string name="debug_log_title">Debug Logs</string>
+    <string name="debug_log_clear">Clear</string>
+    <string name="debug_log_copy">Copy</string>
+    <string name="debug_log_copied">Logs copied</string>
+    <string name="debug_log_no_logs">No logs captured</string>
 </resources>
