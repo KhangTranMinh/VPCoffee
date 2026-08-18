@@ -46,7 +46,7 @@
     <string name="report_day">Ngày</string>
     <string name="report_week">Tuần</string>
     <string name="report_month">Tháng</string>
-    <string name="report_drink_sales">Doanh số</string>
+    <string name="report_drink_sales">Số lượng bán</string>
     <string name="report_drink_sales_item">%1$s: bán %2$d</string>
     <string name="report_no_completed_orders">Chưa có đơn hoàn thành.</string>
     <string name="report_order_item">%1$d × %2$s</string>
