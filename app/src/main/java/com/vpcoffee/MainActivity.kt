@@ -155,7 +155,10 @@ private class PointOfSaleViewModelFactory(private val container: AppContainer) :
 
 private class ReportsViewModelFactory(private val container: AppContainer) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel> create(modelClass: Class<T>): T = ReportsViewModel(container.orderRepository) as T
+    override fun <T : ViewModel> create(modelClass: Class<T>): T = ReportsViewModel(
+        container.orderRepository,
+        container.drinkRepository,
+    ) as T
 }
 
 private enum class AppTab(
