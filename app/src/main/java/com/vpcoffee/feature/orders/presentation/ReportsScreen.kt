@@ -269,17 +269,10 @@ private fun DrinkSalesDialog(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(drinkSales) { (name, quantity) ->
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Text(name, style = MaterialTheme.typography.titleLarge)
-                        Text(
-                            stringResource(R.string.report_drink_sales_item, name, quantity)
-                                .substringAfter(": "),
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                    }
+                    Text(
+                        "$name: [$quantity]",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
                 }
             }
             Button(
