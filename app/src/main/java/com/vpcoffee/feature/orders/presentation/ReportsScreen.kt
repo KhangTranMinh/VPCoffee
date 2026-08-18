@@ -259,11 +259,19 @@ private fun DrinkSalesDialog(
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.primary,
             )
-            Text(
-                formatDate(System.currentTimeMillis(), stringResource(R.string.date_format_day)),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Schedule,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Spacer(Modifier.size(8.dp))
+                Text(
+                    formatDate(System.currentTimeMillis(), stringResource(R.string.date_format_day)),
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+            }
             LazyColumn(
                 modifier = Modifier.heightIn(max = 420.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
