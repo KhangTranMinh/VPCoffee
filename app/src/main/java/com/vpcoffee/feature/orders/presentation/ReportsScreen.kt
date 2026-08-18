@@ -97,17 +97,14 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        stringResource(R.string.report_total_income),
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
-                    Text(
-                        pluralStringResource(
+                        stringResource(R.string.report_total_income) + " (" + pluralStringResource(
                             R.plurals.report_completed_orders,
                             periodOrders.size,
                             periodOrders.size
-                        ), style = MaterialTheme.typography.bodyLarge
+                        ) + ")",
+                        style = MaterialTheme.typography.titleLarge
                     )
+                    Text(formatVnd(totalIncome), style = MaterialTheme.typography.displaySmall)
                 }
             }
         }
