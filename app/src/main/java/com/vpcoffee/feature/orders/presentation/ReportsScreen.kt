@@ -64,6 +64,7 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
     val groupedOrders =
         periodOrders.groupBy { formatDate(it.createdAt, stringResource(R.string.date_format_day)) }
     var selectedOrder by remember { mutableStateOf<Order?>(null) }
+    var showDrinkSales by remember { mutableStateOf(false) }
 
     LazyColumn(
         contentPadding = PaddingValues(
@@ -91,7 +92,11 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
             }
         }
         item {
-            Card(Modifier.fillMaxWidth()) {
+            Card(
+                Modifier
+                    .fillMaxWidth()
+                    .clickable { showDrinkSales = true }
+            ) {
                 Column(
                     Modifier.padding(20.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -115,32 +120,6 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
                 }
             }
         }
-        if (drinkSales.isNotEmpty()) {
-            item {
-                Text(
-                    stringResource(R.string.report_drink_sales),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-            }
-            item {
-                Card(Modifier.fillMaxWidth()) {
-                    Column(
-                        Modifier.padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        drinkSales.forEach { (name, quantity) ->
-                            Text(
-                                stringResource(
-                                    R.string.report_drink_sales_item,
-                                    name,
-                                    quantity
-                                ), style = MaterialTheme.typography.titleMedium
-                            )
-                        }
-                    }
-                }
-            }
-        }
         if (groupedOrders.isEmpty()) {
             item {
                 Text(
@@ -160,6 +139,9 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
         }
     }
     selectedOrder?.let { order -> OrderDetailsDialog(order, onDismiss = { selectedOrder = null }) }
+    if (showDrinkSales) {
+        DrinkSalesDialog(drinkSales, onDismiss = { showDrinkSales = false })
+    }
 }
 
 @Composable
@@ -235,6 +217,59 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
                         stringResource(R.string.report_order_item, item.quantity, item.drinkName),
                         style = MaterialTheme.typography.titleLarge,
                     )
+                }
+            }
+            Button(
+                onClick = onDismiss, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(64.dp)
+            ) {
+                Text(
+                    stringResource(R.string.action_ok),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DrinkSalesDialog(
+    drinkSales: List<Pair<String, Int>>,
+    onDismiss: () -> Unit,
+) = Dialog(
+    onDismissRequest = onDismiss,
+    properties = DialogProperties(usePlatformDefaultWidth = false),
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        shape = AlertDialogDefaults.shape,
+        tonalElevation = AlertDialogDefaults.TonalElevation,
+    ) {
+        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Text(
+                stringResource(R.string.report_drink_sales),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            LazyColumn(
+                modifier = Modifier.heightIn(max = 420.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                items(drinkSales) { (name, quantity) ->
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(name, style = MaterialTheme.typography.titleLarge)
+                        Text(
+                            stringResource(R.string.report_drink_sales_item, name, quantity)
+                                .substringAfter(": "),
+                            style = MaterialTheme.typography.titleLarge,
+                        )
+                    }
                 }
             }
             Button(
