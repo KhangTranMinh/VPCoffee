@@ -208,7 +208,7 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
                 )
                 Spacer(Modifier.size(8.dp))
                 Text(
-                    formatDate(order.createdAt, stringResource(R.string.date_format_order_details)),
+                    formatDate(order.createdAt, stringResource(R.string.date_format_day)),
                     style = MaterialTheme.typography.bodyLarge,
                 )
             }
