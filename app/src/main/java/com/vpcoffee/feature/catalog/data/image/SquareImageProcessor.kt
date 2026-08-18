@@ -12,10 +12,6 @@ import java.util.UUID
 
 suspend fun cropImageToSquare(context: Context, uri: Uri): Uri? = withContext(Dispatchers.IO) {
     val source = context.contentResolver.openInputStream(uri)?.use(BitmapFactory::decodeStream) ?: return@withContext null
-    if (source.width == source.height) {
-        source.recycle()
-        return@withContext uri
-    }
     val size = minOf(source.width, source.height)
     val left = (source.width - size) / 2
     val top = (source.height - size) / 2

@@ -163,7 +163,13 @@ private fun DrinkImage(uri: String?, modifier: Modifier, onClick: (() -> Unit)? 
                     onClick?.let { clickListener -> setOnClickListener { clickListener() } }
                 }
             },
-            update = { it.setImageURI(android.net.Uri.parse(uri)) },
+            update = {
+                try {
+                    it.setImageURI(android.net.Uri.parse(uri))
+                } catch (_: SecurityException) {
+                    // Picker URI permission expired — image inaccessible
+                }
+            },
         )
     }
 }

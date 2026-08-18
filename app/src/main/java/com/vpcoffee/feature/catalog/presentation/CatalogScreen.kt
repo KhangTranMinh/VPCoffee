@@ -266,7 +266,13 @@ private fun DrinkImage(uri: String?, modifier: Modifier = Modifier) {
         AndroidView(
             modifier = modifier.aspectRatio(1f),
             factory = { context -> ImageView(context).apply { scaleType = ImageView.ScaleType.CENTER_CROP } },
-            update = { it.setImageURI(android.net.Uri.parse(uri)) },
+            update = {
+                try {
+                    it.setImageURI(android.net.Uri.parse(uri))
+                } catch (_: SecurityException) {
+                    // Picker URI permission expired — image inaccessible
+                }
+            },
         )
     }
 }
