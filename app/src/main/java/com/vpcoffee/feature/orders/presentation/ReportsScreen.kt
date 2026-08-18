@@ -270,7 +270,7 @@ private fun DrinkSalesDialog(
             ) {
                 items(drinkSales) { (name, quantity) ->
                     Text(
-                        "$name: [$quantity]",
+                        stringResource(R.string.report_order_item, quantity, name),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
