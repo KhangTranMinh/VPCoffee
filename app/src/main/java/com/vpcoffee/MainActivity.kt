@@ -1,38 +1,31 @@
 package com.vpcoffee
 
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.annotation.StringRes
@@ -55,6 +48,7 @@ import com.vpcoffee.feature.orders.presentation.ReportsViewModel
 import com.vpcoffee.feature.sales.presentation.PointOfSaleScreen
 import com.vpcoffee.feature.sales.presentation.PointOfSaleViewModel
 import com.vpcoffee.ui.theme.VPCoffeeTheme
+import kotlin.math.sqrt
 
 class MainActivity : ComponentActivity() {
     private val appContainer by lazy { AppContainer(applicationContext) }
@@ -71,6 +65,8 @@ class MainActivity : ComponentActivity() {
                 var selectedTab by rememberSaveable { mutableStateOf(AppTab.SALE) }
                 var showDebugLog by remember { mutableStateOf(false) }
 
+                ShakeDetector { showDebugLog = true }
+
                 if (showDebugLog) {
                     val debugLogViewModel: DebugLogViewModel = viewModel()
                     DebugLogScreen(debugLogViewModel) { showDebugLog = false }
@@ -78,12 +74,7 @@ class MainActivity : ComponentActivity() {
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
                         topBar = { TopAppBar(title = { Text(stringResource(selectedTab.titleRes)) }) },
-                        bottomBar = {
-                            AppNavigationBar(selectedTab,
-                                onTabSelected = { selectedTab = it },
-                                onSettingsLongClick = { showDebugLog = true },
-                            )
-                        },
+                        bottomBar = { AppNavigationBar(selectedTab) { selectedTab = it } },
                     ) { padding ->
                         when (selectedTab) {
                             AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
@@ -98,74 +89,44 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun RowScope.SettingsNavigationBarItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
-    haptic: androidx.compose.ui.hapticfeedback.HapticFeedback,
-) {
-    val colorScheme = MaterialTheme.colorScheme
-    val iconColor = if (selected) colorScheme.onSurface else colorScheme.onSurfaceVariant
-    val textColor = if (selected) colorScheme.onSurface else colorScheme.onSurfaceVariant
-    Column(
-        modifier = Modifier
-            .weight(1f)
-            .height(80.dp)
-            .combinedClickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onClick,
-                onLongClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onLongClick()
-                },
-            )
-            .padding(top = 12.dp),
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Top,
-    ) {
-        Box {
-            Icon(
-                Icons.Default.Settings,
-                contentDescription = stringResource(R.string.tab_settings),
-                tint = iconColor,
-            )
+private fun ShakeDetector(onShake: () -> Unit) {
+    val context = LocalContext.current
+    val sensorManager = remember { context.getSystemService(SensorManager::class.java) }
+    val accelerometer = remember { sensorManager?.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) }
+    DisposableEffect(Unit) {
+        val listener = object : SensorEventListener {
+            private var lastShakeTime = 0L
+            override fun onSensorChanged(event: SensorEvent) {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+                val magnitude = sqrt((x * x + y * y + z * z).toDouble()) - SensorManager.GRAVITY_EARTH
+                if (magnitude > 15.0) {
+                    val now = System.currentTimeMillis()
+                    if (now - lastShakeTime > 1500) {
+                        lastShakeTime = now
+                        onShake()
+                    }
+                }
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
-        Text(
-            stringResource(R.string.tab_settings),
-            style = androidx.compose.material3.MaterialTheme.typography.titleSmall,
-            color = textColor,
-        )
+        sensorManager?.registerListener(listener, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        onDispose { sensorManager?.unregisterListener(listener) }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun AppNavigationBar(
-    selectedTab: AppTab,
-    onTabSelected: (AppTab) -> Unit,
-    onSettingsLongClick: () -> Unit,
-) {
-    val haptic = LocalHapticFeedback.current
+private fun AppNavigationBar(selectedTab: AppTab, onTabSelected: (AppTab) -> Unit) {
     NavigationBar(modifier = Modifier.height(96.dp)) {
         AppTab.entries.forEach { tab ->
-            if (tab == AppTab.SETTINGS) {
-                SettingsNavigationBarItem(
-                    selected = selectedTab == tab,
-                    onClick = { onTabSelected(tab) },
-                    onLongClick = onSettingsLongClick,
-                    haptic = haptic,
-                )
-            } else {
-                NavigationBarItem(
-                    selected = selectedTab == tab,
-                    onClick = { onTabSelected(tab) },
-                    icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
-                    label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) },
-                )
-            }
+            NavigationBarItem(
+                selected = selectedTab == tab,
+                onClick = { onTabSelected(tab) },
+                icon = { Icon(tab.icon, contentDescription = stringResource(tab.titleRes)) },
+                label = { Text(stringResource(tab.navigationLabelRes), style = androidx.compose.material3.MaterialTheme.typography.titleSmall) },
+            )
         }
     }
 }
