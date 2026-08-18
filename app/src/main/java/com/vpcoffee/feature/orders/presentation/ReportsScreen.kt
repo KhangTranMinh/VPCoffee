@@ -140,7 +140,11 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
     }
     selectedOrder?.let { order -> OrderDetailsDialog(order, onDismiss = { selectedOrder = null }) }
     if (showDrinkSales) {
-        DrinkSalesDialog(drinkSales, onDismiss = { showDrinkSales = false })
+        DrinkSalesDialog(
+            drinkSales,
+            periodLabel = stringResource(period.labelRes),
+            onDismiss = { showDrinkSales = false },
+        )
     }
 }
 
@@ -236,6 +240,7 @@ private fun OrderDetailsDialog(order: Order, onDismiss: () -> Unit) = Dialog(
 @Composable
 private fun DrinkSalesDialog(
     drinkSales: List<Pair<String, Int>>,
+    periodLabel: String,
     onDismiss: () -> Unit,
 ) = Dialog(
     onDismissRequest = onDismiss,
@@ -253,6 +258,11 @@ private fun DrinkSalesDialog(
                 stringResource(R.string.report_drink_sales),
                 style = MaterialTheme.typography.displaySmall,
                 color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                periodLabel + " — " + formatDate(System.currentTimeMillis(), stringResource(R.string.date_format_day)),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             LazyColumn(
                 modifier = Modifier.heightIn(max = 420.dp),
