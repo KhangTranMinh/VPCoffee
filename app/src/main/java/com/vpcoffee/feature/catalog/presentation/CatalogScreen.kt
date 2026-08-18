@@ -127,12 +127,17 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
 @Composable
 private fun DrinkRow(drink: Drink, onClick: () -> Unit, onDelete: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
     ) {
         Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
             DrinkImage(drink.imageUri, Modifier.size(76.dp))
-            Column(Modifier.weight(1f).padding(start = 16.dp)) {
+            Column(
+                Modifier.weight(1f).padding(start = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
                 Text(drink.name, style = MaterialTheme.typography.titleLarge)
                 Text(formatVnd(drink.price), style = MaterialTheme.typography.titleMedium)
             }
@@ -179,7 +184,9 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
         properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         androidx.compose.material3.Surface(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             shape = AlertDialogDefaults.shape,
             tonalElevation = AlertDialogDefaults.TonalElevation,
         ) {
@@ -214,7 +221,9 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth(),
                 )
-                Button(onClick = { imagePicker.launch("image/*") }, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+                Button(onClick = { imagePicker.launch("image/*") }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)) {
                     Icon(Icons.Default.PhotoLibrary, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.catalog_choose_square_image), style = MaterialTheme.typography.titleMedium)
@@ -224,7 +233,9 @@ private fun DrinkEditorDialog(drink: Drink? = null, onDismiss: () -> Unit, onSav
                         cameraImageUri = uri
                         cameraLauncher.launch(uri)
                     }
-                }, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+                }, modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)) {
                     Icon(Icons.Default.PhotoCamera, contentDescription = null)
                     Spacer(Modifier.size(8.dp))
                     Text(stringResource(R.string.catalog_take_photo), style = MaterialTheme.typography.titleMedium)

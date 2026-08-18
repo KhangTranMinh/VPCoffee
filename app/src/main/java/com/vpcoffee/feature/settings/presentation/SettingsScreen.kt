@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -84,7 +85,7 @@ fun SettingsScreen(contentPadding: PaddingValues) {
             Text(stringResource(R.string.settings_notification_access_instruction), style = MaterialTheme.typography.bodyLarge)
             Button(
                 onClick = { context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) },
-                modifier = Modifier.height(64.dp),
+                modifier = Modifier.height(64.dp).fillMaxWidth(),
             ) {
                 Text(stringResource(R.string.settings_grant_access), style = MaterialTheme.typography.titleMedium)
             }
