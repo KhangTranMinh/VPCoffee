@@ -8,14 +8,17 @@ import android.util.Base64
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -44,9 +47,11 @@ import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.Signature
 import java.security.spec.PKCS8EncodedKeySpec
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "PushTest"
-private const val FCM_API_URL = "https://fcm.googleapis.com/v1/projects/vpcoffee-791be/messages:send"
+private const val FCM_API_URL =
+    "https://fcm.googleapis.com/v1/projects/vpcoffee-791be/messages:send"
 private const val OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token"
 private const val SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
 
@@ -55,11 +60,15 @@ class MainActivity : ComponentActivity() {
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
-        Log.d(TAG, if (isGranted) "Notification permission granted" else "Notification permission denied")
+        Log.d(
+            TAG,
+            if (isGranted) "Notification permission granted" else "Notification permission denied"
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
 
         // Request notification permission for Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -102,6 +111,7 @@ fun PushTestScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars)
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
@@ -123,7 +133,7 @@ fun PushTestScreen() {
                     coroutineScope.launch {
                         for (i in 3 downTo 1) {
                             status = "Sending in $i..."
-                            delay(1000)
+                            delay(1000.milliseconds)
                         }
 
                         try {
@@ -232,8 +242,14 @@ private fun getAccessToken(serviceAccountJson: JSONObject): String {
         put("exp", now + 3600)
     }
 
-    val headerBase64 = Base64.encodeToString(header.toString().toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-    val payloadBase64 = Base64.encodeToString(payload.toString().toByteArray(), Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+    val headerBase64 = Base64.encodeToString(
+        header.toString().toByteArray(),
+        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+    )
+    val payloadBase64 = Base64.encodeToString(
+        payload.toString().toByteArray(),
+        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
+    )
     val dataToSign = "$headerBase64.$payloadBase64"
 
     // Sign with private key
@@ -242,7 +258,8 @@ private fun getAccessToken(serviceAccountJson: JSONObject): String {
         initSign(privateKey)
         update(dataToSign.toByteArray())
     }.sign()
-    val signatureBase64 = Base64.encodeToString(signature, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
+    val signatureBase64 =
+        Base64.encodeToString(signature, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
 
     val jwt = "$dataToSign.$signatureBase64"
 
