@@ -16,3 +16,5 @@ credentials/
 .externalNativeBuild
 .cxx
 local.properties
+pushtest/build/
+pushtest/src/main/assets/service-account.json

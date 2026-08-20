@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "199219837870",
+    "project_id": "vpcoffee-791be",
+    "storage_bucket": "vpcoffee-791be.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199219837870:android:c460f72d4feddf0c65e63f",
+        "android_client_info": {
+          "package_name": "com.vpcoffee"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpHRsUPQJWMzYyKD1GmBS7Uw1Tjjp8N4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:199219837870:android:a3d923ec6b48b98065e63f",
+        "android_client_info": {
+          "package_name": "com.vpcoffee.pushtest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpHRsUPQJWMzYyKD1GmBS7Uw1Tjjp8N4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
