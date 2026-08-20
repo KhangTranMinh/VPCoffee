@@ -66,7 +66,14 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
             .padding(bottom = contentPadding.calculateBottomPadding()),
     ) {
         if (drinks.isEmpty()) {
-            Text(stringResource(R.string.sale_add_drinks_first), modifier = Modifier.align(Alignment.Center).padding(32.dp), style = MaterialTheme.typography.titleLarge)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(stringResource(R.string.sale_add_drinks_first), textAlign = TextAlign.Center, style = MaterialTheme.typography.headlineSmall)
+            }
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),

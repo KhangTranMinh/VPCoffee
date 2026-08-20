@@ -41,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -83,8 +84,9 @@ fun CatalogScreen(viewModel: CatalogViewModel, contentPadding: PaddingValues) {
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(stringResource(R.string.catalog_no_drinks), style = MaterialTheme.typography.headlineSmall)
-                Text(stringResource(R.string.catalog_add_first_drink), style = MaterialTheme.typography.bodyLarge)
+                Text(stringResource(R.string.catalog_no_drinks), textAlign = TextAlign.Center, style = MaterialTheme.typography.headlineSmall)
+                Spacer(Modifier.height(8.dp))
+                Text(stringResource(R.string.catalog_add_first_drink), textAlign = TextAlign.Center, style = MaterialTheme.typography.bodyLarge)
             }
         } else {
             LazyColumn(
