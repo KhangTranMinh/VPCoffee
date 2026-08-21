@@ -59,14 +59,10 @@ class PushNotificationService : FirebaseMessagingService() {
     private fun showNotification(title: String, body: String) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
-        // Material Design 3 Primary color (#6750A4)
-        val purpleColor = 0xFF6750A4.toInt()
-
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_edit)
             .setContentTitle(title)
             .setContentText(body)
-            .setColor(purpleColor)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
             .build()
