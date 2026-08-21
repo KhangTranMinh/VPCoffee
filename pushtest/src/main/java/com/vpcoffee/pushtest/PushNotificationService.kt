@@ -60,7 +60,7 @@ class PushNotificationService : FirebaseMessagingService() {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(android.R.drawable.ic_btn_speak_now)
             .setContentTitle(title)
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
