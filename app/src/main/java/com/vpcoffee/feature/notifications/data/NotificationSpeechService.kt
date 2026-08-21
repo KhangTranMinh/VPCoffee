@@ -24,7 +24,7 @@ class NotificationSpeechService : Service(), TextToSpeech.OnInitListener {
 
     companion object {
         private const val TAG = "SpeechService"
-        private const val CHANNEL_ID = "notification_speech_channel"
+        private const val CHANNEL_ID = "vpcoffee_speech_channel"
         private const val NOTIFICATION_ID = 1001
 
         private val _speechFlow = MutableSharedFlow<String>(extraBufferCapacity = 10)
@@ -38,11 +38,7 @@ class NotificationSpeechService : Service(), TextToSpeech.OnInitListener {
 
         fun start(context: Context) {
             val intent = Intent(context, NotificationSpeechService::class.java)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                context.startForegroundService(intent)
-            } else {
-                context.startService(intent)
-            }
+            context.startForegroundService(intent)
         }
 
         fun stop(context: Context) {
@@ -98,17 +94,15 @@ class NotificationSpeechService : Service(), TextToSpeech.OnInitListener {
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                "Notification Speech",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Keeps the app running to read notifications aloud"
-            }
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            "Notification Speech",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Keeps the app running to read notifications aloud"
         }
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager.createNotificationChannel(channel)
     }
 
     private fun createNotification(): Notification {
