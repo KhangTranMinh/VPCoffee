@@ -59,11 +59,8 @@ class PushNotificationService : FirebaseMessagingService() {
     private fun showNotification(title: String, body: String) {
         val notificationManager = getSystemService(NotificationManager::class.java)
 
-        // Get Material Design 3 primary color from application theme
-        val typedValue = android.util.TypedValue()
-        val theme = applicationContext.theme
-        theme.resolveAttribute(com.google.android.material.R.attr.colorPrimary, typedValue, true)
-        val primaryColor = typedValue.data
+        // Material Design 3 Primary color (#6750A4)
+        val primaryColor = 0xFF6750A4.toInt()
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_menu_agenda)
