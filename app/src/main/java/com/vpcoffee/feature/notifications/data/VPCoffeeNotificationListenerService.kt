@@ -22,7 +22,6 @@ class VPCoffeeNotificationListenerService : NotificationListenerService() {
     }
 
     private companion object {
-        // TODO: Change to "com.mservice.momotransfer" for production
         const val PUSH_TEST_PACKAGE = "com.vpcoffee.pushtest"
         val supportedPackages = setOf("com.mservice.momotransfer", PUSH_TEST_PACKAGE)
     }
