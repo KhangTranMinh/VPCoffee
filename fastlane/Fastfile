@@ -15,25 +15,33 @@ platform :android do
 
   desc "Deploy VPCoffee to Firebase App Distribution"
   lane :deploy_vpcoffee do
-    increment_version_code(file: "app/build.gradle.kts")
+    new_version = increment_version_code(file: "app/build.gradle.kts")
     gradle(task: "assembleDebug")
     firebase_app_distribution(
       app: "1:199219837870:android:c460f72d4feddf0c65e63f",
       groups: "internal",
-      release_notes: "VPCoffee debug build",
+      release_notes: "VPCoffee v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
+    )
+    git_commit(
+      path: "app/build.gradle.kts",
+      message: "chore: release v1.0.#{new_version} [skip apk deploy]"
     )
   end
 
   desc "Deploy PushTest to Firebase App Distribution"
   lane :deploy_pushtest do
-    increment_version_code(file: "pushtest/build.gradle.kts")
+    new_version = increment_version_code(file: "pushtest/build.gradle.kts")
     gradle(task: ":pushtest:assembleDebug")
     firebase_app_distribution(
       app: "1:199219837870:android:a3d923ec6b48b98065e63f",
       groups: "internal",
-      release_notes: "PushTest debug build",
+      release_notes: "PushTest v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
+    )
+    git_commit(
+      path: "pushtest/build.gradle.kts",
+      message: "chore: release pushtest v1.0.#{new_version} [skip apk deploy]"
     )
   end
 
