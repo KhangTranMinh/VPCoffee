@@ -114,10 +114,14 @@ class NotificationSpeechService : Service(), TextToSpeech.OnInitListener {
             PendingIntent.FLAG_IMMUTABLE
         )
 
+        // Material Design 3 Primary color (#6750A4)
+        val purpleColor = 0xFF6750A4.toInt()
+
         return Notification.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.speech_service_notification_title))
             .setContentText(getString(R.string.speech_service_notification_text))
-            .setSmallIcon(android.R.drawable.ic_btn_speak_now)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setColor(purpleColor)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .build()
