@@ -120,7 +120,7 @@ class NotificationSpeechService : Service(), TextToSpeech.OnInitListener {
         return Notification.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.speech_service_notification_title))
             .setContentText(getString(R.string.speech_service_notification_text))
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(android.R.drawable.ic_popup_reminder)
             .setColor(purpleColor)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
