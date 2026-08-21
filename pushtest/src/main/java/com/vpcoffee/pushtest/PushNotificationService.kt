@@ -65,7 +65,7 @@ class PushNotificationService : FirebaseMessagingService() {
         val primaryColor = typedValue.data
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_menu_edit)
+            .setSmallIcon(android.R.drawable.ic_menu_agenda)
             .setContentTitle(title)
             .setContentText(body)
             .setColor(primaryColor)
