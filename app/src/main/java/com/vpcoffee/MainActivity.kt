@@ -45,6 +45,7 @@ import com.vpcoffee.feature.debug.presentation.DebugLogViewModel
 import com.vpcoffee.feature.settings.presentation.SettingsScreen
 import com.vpcoffee.feature.orders.presentation.ReportsScreen
 import com.vpcoffee.feature.orders.presentation.ReportsViewModel
+import com.vpcoffee.feature.notifications.data.NotificationSpeechService
 import com.vpcoffee.feature.sales.presentation.PointOfSaleScreen
 import com.vpcoffee.feature.sales.presentation.PointOfSaleViewModel
 import com.vpcoffee.ui.theme.VPCoffeeTheme
@@ -57,6 +58,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        NotificationSpeechService.start(this)
         setContent {
             VPCoffeeTheme {
                 val catalogViewModel: CatalogViewModel = viewModel(factory = CatalogViewModelFactory(appContainer))

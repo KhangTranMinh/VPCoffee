@@ -14,11 +14,10 @@ class VPCoffeeNotificationListenerService : NotificationListenerService() {
         val text = extras.getCharSequence(Notification.EXTRA_TEXT)?.toString().orEmpty()
         val message = listOf(title, text).filter { it.isNotBlank() }.joinToString(". ")
         Log.d("VPCoffeeListener", "Speaking: $message")
-        NotificationSpeechManager.speak(applicationContext, message)
+        NotificationSpeechService.speak(applicationContext, message)
     }
 
     override fun onDestroy() {
-        NotificationSpeechManager.release()
         super.onDestroy()
     }
 
