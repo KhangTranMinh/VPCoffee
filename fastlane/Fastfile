@@ -3,7 +3,9 @@ default_platform(:android)
 platform :android do
   desc "Increment version code in build.gradle.kts"
   private_lane :increment_version_code do |options|
-    file_path = options[:file]
+    # Get project root directory (parent of fastlane folder)
+    project_root = File.expand_path("..", __dir__)
+    file_path = File.join(project_root, options[:file])
     content = File.read(file_path)
     version_code = content.match(/versionCode = (\d+)/)[1].to_i
     new_version_code = version_code + 1
@@ -13,8 +15,22 @@ platform :android do
     new_version_code
   end
 
+  desc "Setup git authentication"
+  private_lane :setup_git_auth do
+    project_root = File.expand_path("..", __dir__)
+    env_file = File.join(project_root, "credentials/.env")
+    token = File.read(env_file).match(/GITHUB_TOKEN=(.+)/)[1].strip
+    sh("git remote set-url origin https://#{token}@github.com/KhangTranMinh/VPCoffee.git")
+  end
+
+  desc "Restore git remote URL"
+  private_lane :restore_git_remote do
+    sh("git remote set-url origin https://github.com/KhangTranMinh/VPCoffee.git")
+  end
+
   desc "Deploy VPCoffee to Firebase App Distribution"
   lane :deploy_vpcoffee do
+    setup_git_auth
     new_version = increment_version_code(file: "app/build.gradle.kts")
     gradle(task: "assembleDebug")
     firebase_app_distribution(
@@ -25,19 +41,22 @@ platform :android do
     )
     # Copy APK to GitHub Pages site
     apk_file = "VPCoffee-v1.0.#{new_version}.apk"
-    sh("mkdir -p site")
-    sh("cp app/build/outputs/apk/debug/app-debug.apk site/#{apk_file}")
-    sh("sed -e 's/__APK_FILE__/#{apk_file}/g' -e 's/__VERSION__/1.0.#{new_version}/g' index.html > site/index.html")
+    project_root = File.expand_path("..", __dir__)
+    sh("mkdir -p #{project_root}/site")
+    sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/site/#{apk_file}")
+    sh("sed -e 's/__APK_FILE__/#{apk_file}/g' -e 's/__VERSION__/1.0.#{new_version}/g' #{project_root}/index.html > #{project_root}/site/index.html")
     git_commit(
       path: ["app/build.gradle.kts", "site/"],
       message: "chore: release v1.0.#{new_version} [skip apk deploy]"
     )
     # Push commit
     sh("git push origin HEAD:main")
+    restore_git_remote
   end
 
   desc "Deploy PushTest to Firebase App Distribution"
   lane :deploy_pushtest do
+    setup_git_auth
     new_version = increment_version_code(file: "pushtest/build.gradle.kts")
     gradle(task: ":pushtest:assembleDebug")
     firebase_app_distribution(
@@ -52,6 +71,7 @@ platform :android do
     )
     # Push commit
     sh("git push origin HEAD:main")
+    restore_git_remote
   end
 
   desc "Deploy both apps to Firebase App Distribution"
