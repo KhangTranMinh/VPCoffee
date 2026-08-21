@@ -60,4 +60,6 @@
     <string name="debug_log_copy">Sao chép</string>
     <string name="debug_log_copied">Đã sao chép nhật ký</string>
     <string name="debug_log_no_logs">Chưa có nhật ký</string>
+    <string name="speech_service_notification_title">VPCoffee</string>
+    <string name="speech_service_notification_text">Đang đọc thông báo</string>
 </resources>

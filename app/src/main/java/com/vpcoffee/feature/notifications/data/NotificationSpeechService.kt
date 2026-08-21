@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.IBinder
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import com.vpcoffee.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -114,8 +115,8 @@ class NotificationSpeechService : Service(), TextToSpeech.OnInitListener {
         )
 
         return Notification.Builder(this, CHANNEL_ID)
-            .setContentTitle("VPCoffee")
-            .setContentText("Reading notifications aloud")
+            .setContentTitle(getString(R.string.speech_service_notification_title))
+            .setContentText(getString(R.string.speech_service_notification_text))
             .setSmallIcon(android.R.drawable.ic_btn_speak_now)
             .setContentIntent(pendingIntent)
             .setOngoing(true)

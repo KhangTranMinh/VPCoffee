@@ -60,4 +60,6 @@
     <string name="debug_log_copy">Copy</string>
     <string name="debug_log_copied">Logs copied</string>
     <string name="debug_log_no_logs">No logs captured</string>
+    <string name="speech_service_notification_title">VPCoffee</string>
+    <string name="speech_service_notification_text">Reading notifications aloud</string>
 </resources>
