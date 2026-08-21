@@ -23,10 +23,17 @@ platform :android do
       release_notes: "VPCoffee v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
     )
+    # Copy APK to GitHub Pages site
+    apk_file = "VPCoffee-v1.0.#{new_version}.apk"
+    sh("mkdir -p site")
+    sh("cp app/build/outputs/apk/debug/app-debug.apk site/#{apk_file}")
+    sh("sed -e 's/__APK_FILE__/#{apk_file}/g' -e 's/__VERSION__/1.0.#{new_version}/g' index.html > site/index.html")
     git_commit(
-      path: "app/build.gradle.kts",
+      path: ["app/build.gradle.kts", "site/"],
       message: "chore: release v1.0.#{new_version} [skip apk deploy]"
     )
+    # Push commit
+    sh("git push origin HEAD:main")
   end
 
   desc "Deploy PushTest to Firebase App Distribution"
@@ -43,11 +50,15 @@ platform :android do
       path: "pushtest/build.gradle.kts",
       message: "chore: release pushtest v1.0.#{new_version} [skip apk deploy]"
     )
+    # Push commit
+    sh("git push origin HEAD:main")
   end
 
   desc "Deploy both apps to Firebase App Distribution"
   lane :deploy_all do
     deploy_vpcoffee
     deploy_pushtest
+    # Push all commits
+    sh("git push origin HEAD:main")
   end
 end

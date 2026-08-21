@@ -46,4 +46,4 @@ bundle exec fastlane deploy_pushtest
 bundle exec fastlane deploy_all
 ```
 
-**Why:** Fastlane auto-increments versionCode before building and deploys to the "internal" group using the service account in `credentials/service-account.json`.
+**Why:** Fastlane auto-increments versionCode before building, deploys to Firebase "internal" group, copies APK to GitHub Pages site, commits version bump, and pushes to GitHub. The `[skip apk deploy]` tag prevents CI from rebuilding the same APK.
