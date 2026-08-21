@@ -45,9 +45,9 @@ class DebugLogViewModel : ViewModel() {
                         lines.forEach { line ->
                             val entry = parseLine(line) ?: return@forEach
                             val current = _logs.value.toMutableList()
-                            current.add(entry)
+                            current.add(0, entry) // Add to beginning for latest-first order
                             // Keep last 2000 entries to avoid memory issues
-                            _logs.value = if (current.size > 2000) current.takeLast(2000) else current
+                            _logs.value = if (current.size > 2000) current.take(2000) else current
                         }
                     }
                 } catch (_: Exception) {
