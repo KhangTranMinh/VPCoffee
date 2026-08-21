@@ -1,0 +1,45 @@
+default_platform(:android)
+
+platform :android do
+  desc "Increment version code in build.gradle.kts"
+  private_lane :increment_version_code do |options|
+    file_path = options[:file]
+    content = File.read(file_path)
+    version_code = content.match(/versionCode = (\d+)/)[1].to_i
+    new_version_code = version_code + 1
+    content.gsub!(/versionCode = \d+/, "versionCode = #{new_version_code}")
+    File.write(file_path, content)
+    UI.success("Incremented versionCode to #{new_version_code} in #{file_path}")
+    new_version_code
+  end
+
+  desc "Deploy VPCoffee to Firebase App Distribution"
+  lane :deploy_vpcoffee do
+    increment_version_code(file: "app/build.gradle.kts")
+    gradle(task: "assembleDebug")
+    firebase_app_distribution(
+      app: "1:199219837870:android:c460f72d4feddf0c65e63f",
+      groups: "internal",
+      release_notes: "VPCoffee debug build",
+      service_credentials_file: "credentials/service-account.json"
+    )
+  end
+
+  desc "Deploy PushTest to Firebase App Distribution"
+  lane :deploy_pushtest do
+    increment_version_code(file: "pushtest/build.gradle.kts")
+    gradle(task: ":pushtest:assembleDebug")
+    firebase_app_distribution(
+      app: "1:199219837870:android:a3d923ec6b48b98065e63f",
+      groups: "internal",
+      release_notes: "PushTest debug build",
+      service_credentials_file: "credentials/service-account.json"
+    )
+  end
+
+  desc "Deploy both apps to Firebase App Distribution"
+  lane :deploy_all do
+    deploy_vpcoffee
+    deploy_pushtest
+  end
+end
