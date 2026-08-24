@@ -88,9 +88,11 @@ platform :android do
 
     # 6. Generate index.html with latest versions
     project_root = File.expand_path("..", __dir__)
-    vp_version = sh("grep 'versionCode' #{project_root}/app/build.gradle.kts | grep -o '\\d*'").strip
-    pt_version = sh("grep 'versionCode' #{project_root}/pushtest/build.gradle.kts | grep -o '\\d*'").strip
-    sh("sed -e 's|__VP_VERSION__|1.0.#{vp_version}|g' -e 's|__PT_VERSION__|1.0.#{pt_version}|g' #{project_root}/template_index.html > #{project_root}/site/index.html")
+    vp_name = sh("grep 'versionName' #{project_root}/app/build.gradle.kts | grep -o '\"[^\"]*\"' | tr -d '\"'").strip
+    vp_code = sh("grep 'versionCode' #{project_root}/app/build.gradle.kts | grep -o '\\d*'").strip
+    pt_name = sh("grep 'versionName' #{project_root}/pushtest/build.gradle.kts | grep -o '\"[^\"]*\"' | tr -d '\"'").strip
+    pt_code = sh("grep 'versionCode' #{project_root}/pushtest/build.gradle.kts | grep -o '\\d*'").strip
+    sh("sed -e 's|__VP_VERSION__|#{vp_name} (#{vp_code})|g' -e 's|__PT_VERSION__|#{pt_name} (#{pt_code})|g' #{project_root}/template_index.html > #{project_root}/site/index.html")
     sh("git add #{project_root}/site/index.html && git commit -m 'Update GitHub Pages with latest versions' || true")
 
     # 7. Push all commits
