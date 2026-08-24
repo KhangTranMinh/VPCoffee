@@ -49,10 +49,7 @@ platform :android do
     project_root = File.expand_path("..", __dir__)
     sh("mkdir -p #{project_root}/site")
     sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/site/VPCoffee.apk")
-    git_commit(
-      path: ["app/build.gradle.kts", "site/VPCoffee.apk"],
-      message: "chore: release v1.0.#{new_version} [skip apk deploy]"
-    )
+    sh("cd #{project_root} && git add app/build.gradle.kts site/VPCoffee.apk && git commit -m 'chore: release v1.0.#{new_version} [skip apk deploy]'")
   end
 
   desc "Deploy PushTest to Firebase App Distribution"
@@ -69,10 +66,7 @@ platform :android do
     project_root = File.expand_path("..", __dir__)
     sh("mkdir -p #{project_root}/site")
     sh("cp #{project_root}/pushtest/build/outputs/apk/debug/pushtest-debug.apk #{project_root}/site/VPCoffeePushTest.apk")
-    git_commit(
-      path: ["pushtest/build.gradle.kts", "site/VPCoffeePushTest.apk"],
-      message: "chore: release pushtest v1.0.#{new_version} [skip apk deploy]"
-    )
+    sh("cd #{project_root} && git add pushtest/build.gradle.kts site/VPCoffeePushTest.apk && git commit -m 'chore: release pushtest v1.0.#{new_version} [skip apk deploy]'")
   end
 
   desc "Deploy both apps to Firebase App Distribution"
