@@ -19,5 +19,4 @@ local.properties
 pushtest/build/
 pushtest/src/main/assets/service-account.json
 fastlane/report.xml
-site/index.html
 fastlane/README.md
