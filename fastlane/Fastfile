@@ -30,7 +30,6 @@ platform :android do
 
   desc "Deploy VPCoffee to Firebase App Distribution"
   lane :deploy_vpcoffee do
-    setup_git_auth
     new_version = increment_version_code(file: "app/build.gradle.kts")
     gradle(task: "assembleDebug")
     firebase_app_distribution(
@@ -49,14 +48,10 @@ platform :android do
       path: ["app/build.gradle.kts", "site/"],
       message: "chore: release v1.0.#{new_version} [skip apk deploy]"
     )
-    # Push commit
-    sh("git push origin HEAD:main")
-    restore_git_remote
   end
 
   desc "Deploy PushTest to Firebase App Distribution"
   lane :deploy_pushtest do
-    setup_git_auth
     new_version = increment_version_code(file: "pushtest/build.gradle.kts")
     gradle(task: ":pushtest:assembleDebug")
     firebase_app_distribution(
@@ -69,16 +64,15 @@ platform :android do
       path: "pushtest/build.gradle.kts",
       message: "chore: release pushtest v1.0.#{new_version} [skip apk deploy]"
     )
-    # Push commit
-    sh("git push origin HEAD:main")
-    restore_git_remote
   end
 
   desc "Deploy both apps to Firebase App Distribution"
   lane :deploy_all do
+    setup_git_auth
     deploy_vpcoffee
     deploy_pushtest
     # Push all commits
     sh("git push origin HEAD:main")
+    restore_git_remote
   end
 end
