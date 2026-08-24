@@ -71,7 +71,8 @@ platform :android do
     setup_git_auth
     deploy_vpcoffee
     deploy_pushtest
-    # Push all commits
+    # Pull latest and push all commits
+    sh("git pull --rebase origin main")
     sh("git push origin HEAD:main")
     restore_git_remote
   end
