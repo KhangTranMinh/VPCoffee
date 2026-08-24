@@ -95,7 +95,8 @@ fun SettingsScreen(contentPadding: PaddingValues) {
         }
         Text(stringResource(R.string.settings_email_title), style = MaterialTheme.typography.headlineMedium)
         val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
-        var email by androidx.compose.runtime.remember { mutableStateOf(prefs.getString("email", "") ?: "") }
+        val defaultEmail = "tran.minhkhang.1989.tester@gmail.com"
+        var email by androidx.compose.runtime.remember { mutableStateOf(prefs.getString("email", defaultEmail) ?: defaultEmail) }
         OutlinedTextField(
             value = email,
             onValueChange = {

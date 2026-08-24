@@ -59,7 +59,6 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
     val drinks by viewModel.drinks.collectAsStateWithLifecycle()
     val cart by viewModel.cart.collectAsStateWithLifecycle()
     var showCart by remember { mutableStateOf(false) }
-    var completedMessage by remember { mutableStateOf(false) }
     Box(
         Modifier
             .fillMaxSize()
@@ -89,50 +88,7 @@ fun PointOfSaleScreen(viewModel: PointOfSaleViewModel, contentPadding: PaddingVa
         }
     }
     if (showCart) CartDialog(cart, drinks, { id, quantity -> viewModel.changeQuantity(id, quantity) }, onDismiss = { showCart = false }) {
-        viewModel.completeOrder { showCart = false; completedMessage = true }
-    }
-    if (completedMessage) OrderSavedDialog { completedMessage = false }
-}
-
-@Composable
-private fun OrderSavedDialog(onDismiss: () -> Unit) = Dialog(
-    onDismissRequest = onDismiss,
-    properties = DialogProperties(usePlatformDefaultWidth = false),
-) {
-    androidx.compose.material3.Surface(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        shape = AlertDialogDefaults.shape,
-        tonalElevation = AlertDialogDefaults.TonalElevation,
-    ) {
-        Column(
-            modifier = Modifier.padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            androidx.compose.material3.Surface(
-                modifier = Modifier.size(96.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBalanceWallet,
-                        contentDescription = null,
-                        modifier = Modifier.size(56.dp),
-                        tint = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
-            Text(
-                stringResource(R.string.sale_order_saved),
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center,
-            )
-            Button(onClick = onDismiss, modifier = Modifier.fillMaxWidth().height(64.dp)) {
-                Text(stringResource(R.string.action_ok), style = MaterialTheme.typography.titleMedium)
-            }
-        }
+        viewModel.completeOrder { showCart = false }
     }
 }
 

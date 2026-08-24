@@ -66,18 +66,47 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues, on
         periodOrders.groupBy { formatDate(it.createdAt, stringResource(R.string.date_format_day)) }
     var selectedOrder by remember { mutableStateOf<Order?>(null) }
     var showDrinkSales by remember { mutableStateOf(false) }
+    var isSending by remember { mutableStateOf(false) }
     val context = androidx.compose.ui.platform.LocalContext.current
 
     // Register send callback
     LaunchedEffect(periodOrders) {
         onRegisterSend?.invoke {
-            val email = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
-                .getString("email", "") ?: ""
-            if (email.isBlank()) {
-                android.widget.Toast.makeText(context, "Please set email in Settings", android.widget.Toast.LENGTH_SHORT).show()
+            if (periodOrders.isEmpty()) {
+                android.widget.Toast.makeText(context, context.getString(R.string.report_no_completed_orders), android.widget.Toast.LENGTH_SHORT).show()
                 return@invoke
             }
-            viewModel.exportAndSendCsv(context, periodOrders, email)
+            val unsentOrders = periodOrders.filter { !it.isSent }
+            if (unsentOrders.isEmpty()) {
+                android.widget.Toast.makeText(context, "All orders already sent", android.widget.Toast.LENGTH_SHORT).show()
+                return@invoke
+            }
+            isSending = true
+            val defaultEmail = "tran.minhkhang.1989.tester@gmail.com"
+            val email = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+                .getString("email", defaultEmail) ?: defaultEmail
+            viewModel.exportAndSendCsv(context, unsentOrders, email) {
+                isSending = false
+            }
+        }
+    }
+
+    if (isSending) {
+        Dialog(onDismissRequest = {}) {
+            Surface(
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                shape = AlertDialogDefaults.shape,
+                tonalElevation = AlertDialogDefaults.TonalElevation,
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    androidx.compose.material3.CircularProgressIndicator()
+                    Text("Sending orders...", style = MaterialTheme.typography.bodyLarge)
+                }
+            }
         }
     }
 

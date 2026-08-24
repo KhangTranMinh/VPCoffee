@@ -43,7 +43,7 @@ class ReportsViewModel(
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun exportAndSendCsv(context: Context, orders: List<Order>, email: String) {
+    fun exportAndSendCsv(context: Context, orders: List<Order>, email: String, onComplete: () -> Unit = {}) {
         viewModelScope.launch {
             try {
                 val csvContent = generateCsv(orders)
@@ -53,6 +53,8 @@ class ReportsViewModel(
                 markOrdersAsSent(orders)
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                onComplete()
             }
         }
     }
@@ -81,15 +83,28 @@ class ReportsViewModel(
     }
 
     private fun sendEmail(context: Context, uri: Uri, email: String, orderCount: Int) {
-        val intent = Intent(Intent.ACTION_SENDTO).apply {
-            data = Uri.parse("mailto:")
+        val gmailIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/csv"
+            setPackage("com.google.android.gm")
             putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
             putExtra(Intent.EXTRA_SUBJECT, "VPCoffee Orders Report - $orderCount orders")
             putExtra(Intent.EXTRA_TEXT, "Please find attached the orders report.")
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(intent, "Send email"))
+        if (gmailIntent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(gmailIntent)
+        } else {
+            val fallbackIntent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/csv"
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(email))
+                putExtra(Intent.EXTRA_SUBJECT, "VPCoffee Orders Report - $orderCount orders")
+                putExtra(Intent.EXTRA_TEXT, "Please find attached the orders report.")
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(fallbackIntent, "Send email"))
+        }
     }
 
     private suspend fun markOrdersAsSent(orders: List<Order>) {
