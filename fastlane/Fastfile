@@ -51,7 +51,6 @@ platform :android do
     sh("mkdir -p #{project_root}/site")
     sh("rm -f #{project_root}/site/VPCoffee-*.apk")
     sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/site/#{apk_file}")
-    sh("sed -e 's/__APK_FILE__/#{apk_file}/g' -e 's/__VERSION__/1.0.#{new_version}/g' #{project_root}/index.html > #{project_root}/site/index.html")
     git_commit(
       path: ["app/build.gradle.kts", "site/"],
       message: "chore: release v1.0.#{new_version} [skip apk deploy]"
@@ -97,10 +96,19 @@ platform :android do
     # 5. Deploy PushTest (increment, build, Firebase, GitHub Pages, commit)
     deploy_pushtest
 
-    # 6. Push all commits
+    # 6. Generate index.html with both APK links
+    project_root = File.expand_path("..", __dir__)
+    vp_version = sh("grep 'versionCode' #{project_root}/app/build.gradle.kts | grep -o '\\d*'").strip
+    pt_version = sh("grep 'versionCode' #{project_root}/pushtest/build.gradle.kts | grep -o '\\d*'").strip
+    vp_apk = sh("ls #{project_root}/site/VPCoffee-*.apk 2>/dev/null | head -1").strip
+    pt_apk = sh("ls #{project_root}/site/PushTest-*.apk 2>/dev/null | head -1").strip
+    sh("sed -e 's|__VP_APK__|#{File.basename(vp_apk)}|g' -e 's|__VP_VERSION__|1.0.#{vp_version}|g' -e 's|__PT_APK__|#{File.basename(pt_apk)}|g' #{project_root}/index.html > #{project_root}/site/index.html")
+    sh("git add #{project_root}/site/index.html && git commit -m 'Update GitHub Pages index.html' || true")
+
+    # 7. Push all commits
     sh("git push origin HEAD:main")
 
-    # 7. Restore git remote
+    # 8. Restore git remote
     restore_git_remote
   end
 end
