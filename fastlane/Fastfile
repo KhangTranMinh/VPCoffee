@@ -45,11 +45,10 @@ platform :android do
       release_notes: "VPCoffee v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
     )
-    # Copy APK to GitHub Pages site
+    # Copy APK to root for GitHub Pages
     project_root = File.expand_path("..", __dir__)
-    sh("mkdir -p #{project_root}/site")
-    sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/site/VPCoffee.apk")
-    sh("cd #{project_root} && git add app/build.gradle.kts site/VPCoffee.apk && git commit -m 'chore: release v1.0.#{new_version} [skip apk deploy]'")
+    sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/VPCoffee.apk")
+    sh("cd #{project_root} && git add app/build.gradle.kts VPCoffee.apk && git commit -m 'chore: release v1.0.#{new_version} [skip apk deploy]'")
   end
 
   desc "Deploy PushTest to Firebase App Distribution"
@@ -62,11 +61,10 @@ platform :android do
       release_notes: "PushTest v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
     )
-    # Copy APK to GitHub Pages site
+    # Copy APK to root for GitHub Pages
     project_root = File.expand_path("..", __dir__)
-    sh("mkdir -p #{project_root}/site")
-    sh("cp #{project_root}/pushtest/build/outputs/apk/debug/pushtest-debug.apk #{project_root}/site/VPCoffeePushTest.apk")
-    sh("cd #{project_root} && git add pushtest/build.gradle.kts site/VPCoffeePushTest.apk && git commit -m 'chore: release pushtest v1.0.#{new_version} [skip apk deploy]'")
+    sh("cp #{project_root}/pushtest/build/outputs/apk/debug/pushtest-debug.apk #{project_root}/VPCoffeePushTest.apk")
+    sh("cd #{project_root} && git add pushtest/build.gradle.kts VPCoffeePushTest.apk && git commit -m 'chore: release pushtest v1.0.#{new_version} [skip apk deploy]'")
   end
 
   desc "Deploy both apps to Firebase App Distribution"
@@ -92,8 +90,8 @@ platform :android do
     vp_code = sh("grep 'versionCode' #{project_root}/app/build.gradle.kts | grep -o '\\d*'").strip
     pt_name = sh("grep 'versionName' #{project_root}/pushtest/build.gradle.kts | grep -o '\"[^\"]*\"' | tr -d '\"'").strip
     pt_code = sh("grep 'versionCode' #{project_root}/pushtest/build.gradle.kts | grep -o '\\d*'").strip
-    sh("sed -e 's|__VP_VERSION__|#{vp_name} (#{vp_code})|g' -e 's|__PT_VERSION__|#{pt_name} (#{pt_code})|g' #{project_root}/template_index.html > #{project_root}/site/index.html")
-    sh("git add #{project_root}/site/index.html && git commit -m 'Update GitHub Pages with latest versions' || true")
+    sh("sed -e 's|__VP_VERSION__|#{vp_name} (#{vp_code})|g' -e 's|__PT_VERSION__|#{pt_name} (#{pt_code})|g' #{project_root}/template_index.html > #{project_root}/index.html")
+    sh("git add #{project_root}/index.html && git commit -m 'Update GitHub Pages with latest versions' || true")
 
     # 7. Push all commits
     sh("git push origin HEAD:main")
