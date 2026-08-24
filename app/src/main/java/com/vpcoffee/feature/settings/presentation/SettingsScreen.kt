@@ -15,6 +15,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,6 +93,19 @@ fun SettingsScreen(contentPadding: PaddingValues) {
                 Text(stringResource(R.string.settings_grant_access), style = MaterialTheme.typography.titleMedium)
             }
         }
+        Text(stringResource(R.string.settings_email_title), style = MaterialTheme.typography.headlineMedium)
+        val prefs = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+        var email by androidx.compose.runtime.remember { mutableStateOf(prefs.getString("email", "") ?: "") }
+        OutlinedTextField(
+            value = email,
+            onValueChange = {
+                email = it
+                prefs.edit().putString("email", it).apply()
+            },
+            label = { Text(stringResource(R.string.settings_email_label)) },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+        )
         Spacer(modifier = Modifier.weight(1f))
         Text(
             text = "v${com.vpcoffee.BuildConfig.VERSION_NAME} (${com.vpcoffee.BuildConfig.VERSION_CODE})",

@@ -62,4 +62,6 @@
     <string name="debug_log_no_logs">No logs captured</string>
     <string name="speech_service_notification_title">VPCoffee</string>
     <string name="speech_service_notification_text">Reading notifications aloud</string>
+    <string name="settings_email_title">Email for Reports</string>
+    <string name="settings_email_label">Email address</string>
 </resources>

@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface OrderRepository {
     fun observeOrders(): Flow<List<Order>>
     suspend fun saveOrder(order: Order): String
+    suspend fun markOrdersAsSent(orderIds: List<String>)
 }

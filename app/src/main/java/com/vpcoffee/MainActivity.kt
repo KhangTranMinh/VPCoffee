@@ -31,9 +31,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material3.IconButton
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -73,15 +75,30 @@ class MainActivity : ComponentActivity() {
                     val debugLogViewModel: DebugLogViewModel = viewModel()
                     DebugLogScreen(debugLogViewModel) { showDebugLog = false }
                 } else {
+                    var sendOrdersCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
                     Scaffold(
                         modifier = Modifier.fillMaxSize(),
-                        topBar = { TopAppBar(title = { Text(stringResource(selectedTab.titleRes)) }) },
+                        topBar = {
+                            TopAppBar(
+                                title = { Text(stringResource(selectedTab.titleRes)) },
+                                actions = {
+                                    if (selectedTab == AppTab.REPORTS) {
+                                        IconButton(onClick = { sendOrdersCallback?.invoke() }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Send,
+                                                contentDescription = "Send orders",
+                                            )
+                                        }
+                                    }
+                                },
+                            )
+                        },
                         bottomBar = { AppNavigationBar(selectedTab) { selectedTab = it } },
                     ) { padding ->
                         when (selectedTab) {
                             AppTab.SALE -> PointOfSaleScreen(pointOfSaleViewModel, padding)
                             AppTab.CATALOG -> CatalogScreen(catalogViewModel, padding)
-                            AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding)
+                            AppTab.REPORTS -> ReportsScreen(reportsViewModel, padding) { sendOrdersCallback = it }
                             AppTab.SETTINGS -> SettingsScreen(padding)
                         }
                     }

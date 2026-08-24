@@ -62,4 +62,6 @@
     <string name="debug_log_no_logs">Chưa có nhật ký</string>
     <string name="speech_service_notification_title">VPCoffee</string>
     <string name="speech_service_notification_text">Đang đọc thông báo</string>
+    <string name="settings_email_title">Email cho Báo cáo</string>
+    <string name="settings_email_label">Địa chỉ email</string>
 </resources>

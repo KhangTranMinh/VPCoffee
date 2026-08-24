@@ -13,7 +13,7 @@ class AppContainer(context: Context) {
         context.applicationContext,
         AppDatabase::class.java,
         "vpcoffee.db",
-    ).fallbackToDestructiveMigration().build()
+    ).addMigrations(AppDatabase.MIGRATION_2_3).build()
 
     val drinkRepository: DrinkRepository = DrinkRepositoryImpl(database.drinkDao())
     val orderRepository: OrderRepository = OrderRepositoryImpl(database, database.orderDao())

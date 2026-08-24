@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 data class OrderEntity(
     @PrimaryKey val id: String,
     val createdAt: Long,
+    val sentAt: Long? = null,
 )
 
 @Entity(tableName = "order_items", primaryKeys = ["orderId", "drinkId"])
@@ -39,4 +40,7 @@ interface OrderDao {
 
     @Upsert
     suspend fun upsertItems(items: List<OrderItemEntity>)
+
+    @Query("UPDATE orders SET sentAt = :sentAt WHERE id IN (:orderIds)")
+    suspend fun markAsSent(orderIds: List<String>, sentAt: Long)
 }

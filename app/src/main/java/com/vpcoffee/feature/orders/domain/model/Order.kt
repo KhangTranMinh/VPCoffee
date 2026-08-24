@@ -4,8 +4,10 @@ data class Order(
     val id: String,
     val createdAt: Long,
     val items: List<OrderItem>,
+    val sentAt: Long? = null,
 ) {
     val total: Long get() = items.sumOf { it.unitPrice * it.quantity }
+    val isSent: Boolean get() = sentAt != null
 }
 
 data class OrderItem(

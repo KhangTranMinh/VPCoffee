@@ -26,6 +26,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +54,7 @@ private enum class ReportPeriod(@StringRes val labelRes: Int) {
 }
 
 @Composable
-fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
+fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues, onRegisterSend: ((() -> Unit) -> Unit)? = null) {
     val orders by viewModel.orders.collectAsStateWithLifecycle()
     var period by remember { mutableStateOf(ReportPeriod.DAY) }
     val periodOrders = orders.filter { it.isInPeriod(period) }
@@ -65,6 +66,20 @@ fun ReportsScreen(viewModel: ReportsViewModel, contentPadding: PaddingValues) {
         periodOrders.groupBy { formatDate(it.createdAt, stringResource(R.string.date_format_day)) }
     var selectedOrder by remember { mutableStateOf<Order?>(null) }
     var showDrinkSales by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
+
+    // Register send callback
+    LaunchedEffect(periodOrders) {
+        onRegisterSend?.invoke {
+            val email = context.getSharedPreferences("settings", android.content.Context.MODE_PRIVATE)
+                .getString("email", "") ?: ""
+            if (email.isBlank()) {
+                android.widget.Toast.makeText(context, "Please set email in Settings", android.widget.Toast.LENGTH_SHORT).show()
+                return@invoke
+            }
+            viewModel.exportAndSendCsv(context, periodOrders, email)
+        }
+    }
 
     LazyColumn(
         contentPadding = PaddingValues(

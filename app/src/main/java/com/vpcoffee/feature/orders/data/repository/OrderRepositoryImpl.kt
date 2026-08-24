@@ -23,15 +23,20 @@ class OrderRepositoryImpl(
                 items = order.items.map { item ->
                     OrderItem(item.drinkId, item.drinkName, item.unitPrice, item.quantity)
                 },
+                sentAt = order.order.sentAt,
             )
         }
     }
 
     override suspend fun saveOrder(order: Order): String = database.withTransaction {
-        orderDao.upsertOrder(OrderEntity(order.id, order.createdAt))
+        orderDao.upsertOrder(OrderEntity(order.id, order.createdAt, order.sentAt))
         orderDao.upsertItems(order.items.map { item ->
             OrderItemEntity(order.id, item.drinkId, item.drinkName, item.unitPrice, item.quantity)
         })
         order.id
+    }
+
+    override suspend fun markOrdersAsSent(orderIds: List<String>) {
+        orderDao.markAsSent(orderIds, System.currentTimeMillis())
     }
 }
