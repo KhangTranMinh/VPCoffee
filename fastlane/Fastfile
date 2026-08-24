@@ -1,9 +1,16 @@
 default_platform(:android)
 
 platform :android do
+  desc "Check git status is clean"
+  private_lane :check_git_clean do
+    status = sh("git status --porcelain")
+    unless status.strip.empty?
+      UI.user_error!("Git working directory is not clean. Please commit or stash your changes first.")
+    end
+  end
+
   desc "Increment version code in build.gradle.kts"
   private_lane :increment_version_code do |options|
-    # Get project root directory (parent of fastlane folder)
     project_root = File.expand_path("..", __dir__)
     file_path = File.join(project_root, options[:file])
     content = File.read(file_path)
@@ -38,10 +45,11 @@ platform :android do
       release_notes: "VPCoffee v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
     )
-    # Copy APK to GitHub Pages site
+    # Copy APK to GitHub Pages site (only keep latest)
     apk_file = "VPCoffee-v1.0.#{new_version}.apk"
     project_root = File.expand_path("..", __dir__)
     sh("mkdir -p #{project_root}/site")
+    sh("rm -f #{project_root}/site/VPCoffee-*.apk")
     sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/site/#{apk_file}")
     sh("sed -e 's/__APK_FILE__/#{apk_file}/g' -e 's/__VERSION__/1.0.#{new_version}/g' #{project_root}/index.html > #{project_root}/site/index.html")
     git_commit(
@@ -60,20 +68,39 @@ platform :android do
       release_notes: "PushTest v1.0.#{new_version}",
       service_credentials_file: "credentials/service-account.json"
     )
+    # Copy APK to GitHub Pages site (only keep latest)
+    apk_file = "PushTest-v1.0.#{new_version}.apk"
+    project_root = File.expand_path("..", __dir__)
+    sh("mkdir -p #{project_root}/site")
+    sh("rm -f #{project_root}/site/PushTest-*.apk")
+    sh("cp #{project_root}/pushtest/build/outputs/apk/debug/pushtest-debug.apk #{project_root}/site/#{apk_file}")
     git_commit(
-      path: "pushtest/build.gradle.kts",
+      path: ["pushtest/build.gradle.kts", "site/"],
       message: "chore: release pushtest v1.0.#{new_version} [skip apk deploy]"
     )
   end
 
   desc "Deploy both apps to Firebase App Distribution"
   lane :deploy_all do
+    # 1. Check git status is clean
+    check_git_clean
+
+    # 2. Setup git auth
     setup_git_auth
-    deploy_vpcoffee
-    deploy_pushtest
-    # Pull latest and push all commits
+
+    # 3. Pull latest first
     sh("git pull --rebase origin main")
+
+    # 4. Deploy VPCoffee (increment, build, Firebase, GitHub Pages, commit)
+    deploy_vpcoffee
+
+    # 5. Deploy PushTest (increment, build, Firebase, GitHub Pages, commit)
+    deploy_pushtest
+
+    # 6. Push all commits
     sh("git push origin HEAD:main")
+
+    # 7. Restore git remote
     restore_git_remote
   end
 end
