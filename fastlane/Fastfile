@@ -96,7 +96,7 @@ platform :android do
     project_root = File.expand_path("..", __dir__)
     vp_version = sh("grep 'versionCode' #{project_root}/app/build.gradle.kts | grep -o '\\d*'").strip
     pt_version = sh("grep 'versionCode' #{project_root}/pushtest/build.gradle.kts | grep -o '\\d*'").strip
-    sh("sed -e 's|__VP_VERSION__|1.0.#{vp_version}|g' -e 's|__PT_VERSION__|1.0.#{pt_version}|g' #{project_root}/index.html > #{project_root}/site/index.html")
+    sh("sed -e 's|__VP_VERSION__|1.0.#{vp_version}|g' -e 's|__PT_VERSION__|1.0.#{pt_version}|g' #{project_root}/template_index.html > #{project_root}/site/index.html")
     sh("git add #{project_root}/site/index.html && git commit -m 'Update GitHub Pages with latest versions' || true")
 
     # 7. Push all commits
