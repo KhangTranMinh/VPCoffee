@@ -6,6 +6,7 @@ import android.provider.Settings
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -90,6 +91,13 @@ fun SettingsScreen(contentPadding: PaddingValues) {
                 Text(stringResource(R.string.settings_grant_access), style = MaterialTheme.typography.titleMedium)
             }
         }
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "v${com.vpcoffee.BuildConfig.VERSION_NAME} (${com.vpcoffee.BuildConfig.VERSION_CODE})",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+        )
     }
 }
 

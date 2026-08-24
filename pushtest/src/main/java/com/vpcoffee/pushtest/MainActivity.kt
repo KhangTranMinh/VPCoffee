@@ -162,6 +162,13 @@ fun PushTestScreen() {
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.primary,
         )
+
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+            text = "v${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }
 
