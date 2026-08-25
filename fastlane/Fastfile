@@ -39,13 +39,13 @@ platform :android do
   lane :deploy_vpcoffee do
     project_root = File.expand_path("..", __dir__)
     new_version = increment_version_code(file: "app/build.gradle.kts")
-    gradle(task: "assembleDebug")
+    gradle(task: ":app:assembleDebug")
     firebase_app_distribution(
       app: "1:199219837870:android:c460f72d4feddf0c65e63f",
       groups: "internal",
       release_notes: "VPCoffee v1.0.#{new_version}",
       service_credentials_file: "#{project_root}/credentials/service-account.json",
-      debug: true
+      apk_path: "#{project_root}/app/build/outputs/apk/debug/app-debug.apk"
     )
     # Copy APK to root for GitHub Pages
     sh("cp #{project_root}/app/build/outputs/apk/debug/app-debug.apk #{project_root}/VPCoffee.apk")
@@ -62,7 +62,7 @@ platform :android do
       groups: "internal",
       release_notes: "PushTest v1.0.#{new_version}",
       service_credentials_file: "#{project_root}/credentials/service-account.json",
-      debug: true
+      apk_path: "#{project_root}/pushtest/build/outputs/apk/debug/pushtest-debug.apk"
     )
     # Copy APK to root for GitHub Pages
     sh("cp #{project_root}/pushtest/build/outputs/apk/debug/pushtest-debug.apk #{project_root}/VPCoffeePushTest.apk")
