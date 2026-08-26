@@ -1,0 +1,13 @@
+{
+  "name": "vpcoffee-cloudflare-worker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0",
+    "miniflare": "^3.20240806.0"
+  }
+}
