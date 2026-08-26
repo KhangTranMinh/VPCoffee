@@ -14,8 +14,8 @@ android {
         applicationId = "com.vpcoffee"
         minSdk = 26
         targetSdk = 37
-        versionCode = 74
-        versionName = "1.0.61"
+        versionCode = 75
+        versionName = "1.0.62"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
