@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Base64
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,17 +13,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,17 +41,11 @@ import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-import java.security.KeyFactory
-import java.security.PrivateKey
-import java.security.Signature
-import java.security.spec.PKCS8EncodedKeySpec
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val TAG = "PushTest"
-private const val FCM_API_URL =
-    "https://fcm.googleapis.com/v1/projects/vpcoffee-791be/messages:send"
-private const val OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token"
-private const val SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
+private const val WORKER_URL =
+    "https://send-push-notification.kloverahn.workers.dev/send-push"
 
 class MainActivity : ComponentActivity() {
 
@@ -94,7 +83,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun PushTestScreen(contentPadding: PaddingValues) {
-    val context = androidx.compose.ui.platform.LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var status by remember { mutableStateOf("Ready") }
     var fcmToken by remember { mutableStateOf("") }
@@ -141,7 +129,7 @@ fun PushTestScreen(contentPadding: PaddingValues) {
 
                         try {
                             withContext(Dispatchers.IO) {
-                                sendPushNotification(context, fcmToken)
+                                sendPushNotification(fcmToken)
                             }
                             status = "Sent"
                         } catch (e: Exception) {
@@ -177,40 +165,26 @@ fun PushTestScreen(contentPadding: PaddingValues) {
     }
 }
 
-private fun sendPushNotification(context: android.content.Context, targetToken: String) {
-    // 1. Load service account and get access token
-    val serviceAccountJson = loadServiceAccount(context)
-    val accessToken = getAccessToken(serviceAccountJson)
-
-    // 2. Send FCM HTTP v1 API request
-    val url = URL(FCM_API_URL)
+private fun sendPushNotification(targetToken: String) {
+    val url = URL(WORKER_URL)
     val connection = url.openConnection() as HttpURLConnection
 
     try {
         connection.requestMethod = "POST"
         connection.setRequestProperty("Content-Type", "application/json")
-        connection.setRequestProperty("Authorization", "Bearer $accessToken")
         connection.doOutput = true
 
         val amount = (1..999).random()
-        val message = JSONObject().apply {
-            put("message", JSONObject().apply {
-                put("token", targetToken)
-                put("notification", JSONObject().apply {
-                    put("title", "Thông báo")
-                    put("body", "Đã nhận ${amount}.000 đồng")
-                })
-                put("data", JSONObject().apply {
-                    put("title", "Thông báo")
-                    put("body", "Đã nhận ${amount}.000 đồng")
-                })
-            })
+        val body = JSONObject().apply {
+            put("token", targetToken)
+            put("title", "Thông báo")
+            put("body", "Đã nhận ${amount}.000 đồng")
         }
 
-        Log.d(TAG, "Sending FCM message: ${message.toString(2)}")
+        Log.d(TAG, "Sending via Cloudflare Worker: $body")
 
         connection.outputStream.use { os ->
-            os.write(message.toString().toByteArray())
+            os.write(body.toString().toByteArray())
         }
 
         val responseCode = connection.responseCode
@@ -220,97 +194,12 @@ private fun sendPushNotification(context: android.content.Context, targetToken: 
             connection.errorStream.bufferedReader().readText()
         }
 
-        Log.d(TAG, "FCM Response: $responseCode - $response")
+        Log.d(TAG, "Worker Response: $responseCode - $response")
 
         if (responseCode !in 200..299) {
-            throw Exception("FCM API error: $responseCode - $response")
+            throw Exception("Worker error: $responseCode - $response")
         }
     } finally {
         connection.disconnect()
     }
-}
-
-private fun loadServiceAccount(context: android.content.Context): JSONObject {
-    val inputStream = context.assets.open("service-account.json")
-    val jsonString = inputStream.bufferedReader().readText()
-    return JSONObject(jsonString)
-}
-
-private fun getAccessToken(serviceAccountJson: JSONObject): String {
-    val clientEmail = serviceAccountJson.getString("client_email")
-    val privateKeyPem = serviceAccountJson.getString("private_key")
-
-    // Create JWT
-    val now = System.currentTimeMillis() / 1000
-    val header = JSONObject().apply {
-        put("alg", "RS256")
-        put("typ", "JWT")
-    }
-    val payload = JSONObject().apply {
-        put("iss", clientEmail)
-        put("scope", SCOPE)
-        put("aud", OAUTH_TOKEN_URL)
-        put("iat", now)
-        put("exp", now + 3600)
-    }
-
-    val headerBase64 = Base64.encodeToString(
-        header.toString().toByteArray(),
-        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
-    )
-    val payloadBase64 = Base64.encodeToString(
-        payload.toString().toByteArray(),
-        Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING
-    )
-    val dataToSign = "$headerBase64.$payloadBase64"
-
-    // Sign with private key
-    val privateKey = loadPrivateKey(privateKeyPem)
-    val signature = Signature.getInstance("SHA256withRSA").apply {
-        initSign(privateKey)
-        update(dataToSign.toByteArray())
-    }.sign()
-    val signatureBase64 =
-        Base64.encodeToString(signature, Base64.URL_SAFE or Base64.NO_WRAP or Base64.NO_PADDING)
-
-    val jwt = "$dataToSign.$signatureBase64"
-
-    // Exchange JWT for access token
-    val url = URL(OAUTH_TOKEN_URL)
-    val connection = url.openConnection() as HttpURLConnection
-
-    try {
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
-        connection.doOutput = true
-
-        val body = "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=$jwt"
-        connection.outputStream.use { os ->
-            os.write(body.toByteArray())
-        }
-
-        val responseCode = connection.responseCode
-        val response = if (responseCode in 200..299) {
-            connection.inputStream.bufferedReader().readText()
-        } else {
-            val error = connection.errorStream.bufferedReader().readText()
-            throw Exception("OAuth token error: $responseCode - $error")
-        }
-
-        val responseJson = JSONObject(response)
-        return responseJson.getString("access_token")
-    } finally {
-        connection.disconnect()
-    }
-}
-
-private fun loadPrivateKey(privateKeyPem: String): PrivateKey {
-    val privateKeyContent = privateKeyPem
-        .replace("-----BEGIN PRIVATE KEY-----", "")
-        .replace("-----END PRIVATE KEY-----", "")
-        .replace("\\s+".toRegex(), "")
-
-    val decoded = Base64.decode(privateKeyContent, Base64.DEFAULT)
-    val keySpec = PKCS8EncodedKeySpec(decoded)
-    return KeyFactory.getInstance("RSA").generatePrivate(keySpec)
 }

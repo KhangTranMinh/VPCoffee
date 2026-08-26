@@ -1,0 +1,8 @@
+name = "send-push-notification"
+main = "src/index.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+FCM_API_URL = "https://fcm.googleapis.com/v1/projects/vpcoffee-791be/messages:send"
+OAUTH_TOKEN_URL = "https://oauth2.googleapis.com/token"
+OAUTH_SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
