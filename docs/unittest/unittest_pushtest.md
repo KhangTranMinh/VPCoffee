@@ -63,6 +63,5 @@ Tests for the push notification message handling logic.
 ### Recommendations for Future Testing
 
 1. **Refactor `MainActivity`** — Extract HTTP client into an interface for mocking
-2. **Add Robolectric** — Enable local Android framework simulation
-3. **Add Compose UI tests** — Test the `PushTestScreen` composable
-4. **Add instrumented tests** — Full integration tests for `PushNotificationService`
+2. **Add Compose UI tests** — Test the `PushTestScreen` composable
+3. **Add instrumented tests** — Full integration tests for `PushNotificationService`
