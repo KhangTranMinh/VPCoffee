@@ -1,47 +1,68 @@
 # ============================================================================
-# DISABLED WORKFLOW - NOT NEEDED
+# DEPLOY WORKFLOW - Same as Fastlane but runs on GitHub
 # ============================================================================
 #
-# This workflow is DISABLED because:
+# Use this when you DON'T have source code locally.
+# Use Fastlane when you DO have source code locally.
 #
-# 1. Fastlane handles deployments:
-#    - Version increment
-#    - APK build
-#    - Firebase App Distribution
-#    - Git commit and push
+# Both do the same thing:
+#   1. Increment version
+#   2. Build APKs
+#   3. Deploy to Firebase App Distribution
+#   4. Commit version bump
+#   5. Push to main
 #
-# 2. GitHub Pages auto-deploys on push to main:
-#    - Configured in GitHub repo settings
-#    - No workflow needed
-#
-# To deploy, use Fastlane:
-#   bundle exec fastlane deploy_vpcoffee
-#   bundle exec fastlane deploy_pushtest
-#   bundle exec fastlane deploy_all
-#
-# This file is kept for reference only.
+# GitHub Pages auto-deploys on push to main.
 # ============================================================================
 
-name: "[DISABLED] Deploy APK to GitHub Pages"
+name: Deploy to Firebase
 
-# DISABLED: No triggers
-# Use Fastlane for deployments
 on:
   workflow_dispatch:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: github-pages
-  cancel-in-progress: true
 
 jobs:
-  build:
-    if: false  # Always skip
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Placeholder
-        run: echo "This workflow is disabled. Use Fastlane instead."
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Set up Fastlane
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy with Fastlane
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          # Set service account for Firebase
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > credentials/service-account.json
+
+          # Set GitHub token for push
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+          # Run Fastlane deploy_all
+          bundle exec fastlane deploy_all
+
+      - name: Clean up credentials
+        if: always()
+        run: rm -f credentials/service-account.json
