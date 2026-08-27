@@ -60,8 +60,8 @@ jobs:
           # Set service account for Firebase
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > credentials/service-account.json
 
-          # Set GitHub token for push
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          # Create .env file for Fastlane
+          echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}" > credentials/.env
 
           # Run Fastlane deploy_all
           bundle exec fastlane deploy_all
