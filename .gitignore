@@ -19,3 +19,5 @@ local.properties
 pushtest/build/
 fastlane/report.xml
 fastlane/README.md
+.bundle/
+vendor/
