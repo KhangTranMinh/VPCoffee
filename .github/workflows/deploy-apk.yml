@@ -1,10 +1,30 @@
-name: Publish APK to GitHub Pages
+# ============================================================================
+# DISABLED WORKFLOW - DO NOT RUN AUTOMATICALLY
+# ============================================================================
+#
+# This workflow is DISABLED because we now use Fastlane for deployments.
+#
+# Fastlane handles:
+#   - Version increment
+#   - APK build
+#   - Firebase App Distribution deployment
+#   - GitHub Pages update
+#   - Git commit and push
+#
+# To deploy, use Fastlane instead:
+#   bundle exec fastlane deploy_vpcoffee
+#   bundle exec fastlane deploy_pushtest
+#   bundle exec fastlane deploy_all
+#
+# This workflow is kept for reference only. It will NOT run on push.
+# To run manually: use workflow_dispatch (GitHub Actions UI)
+# ============================================================================
 
+name: "[DISABLED] Publish APK to GitHub Pages"
+
+# DISABLED: Only allow manual trigger via workflow_dispatch
+# Removed automatic push trigger - use Fastlane instead
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - app/build.gradle.kts
   workflow_dispatch:
 
 permissions:
@@ -18,7 +38,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip apk deploy]')
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -72,7 +92,7 @@ jobs:
           path: site
 
   deploy:
-    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip apk deploy]')
+    if: github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     environment:
