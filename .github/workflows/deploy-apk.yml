@@ -1,30 +1,30 @@
 # ============================================================================
-# DISABLED WORKFLOW - DO NOT RUN AUTOMATICALLY
+# GITHUB PAGES DEPLOYMENT WORKFLOW
 # ============================================================================
 #
-# This workflow is DISABLED because we now use Fastlane for deployments.
+# This workflow deploys APKs to GitHub Pages when code is pushed to main.
+# It matches the Fastlane logic for GitHub Pages deployment.
 #
 # Fastlane handles:
 #   - Version increment
 #   - APK build
 #   - Firebase App Distribution deployment
-#   - GitHub Pages update
 #   - Git commit and push
 #
-# To deploy, use Fastlane instead:
-#   bundle exec fastlane deploy_vpcoffee
-#   bundle exec fastlane deploy_pushtest
-#   bundle exec fastlane deploy_all
+# This workflow handles:
+#   - GitHub Pages deployment (runs after Fastlane pushes)
 #
-# This workflow is kept for reference only. It will NOT run on push.
-# To run manually: use workflow_dispatch (GitHub Actions UI)
+# To deploy manually: use workflow_dispatch (GitHub Actions UI)
 # ============================================================================
 
-name: "[DISABLED] Publish APK to GitHub Pages"
+name: Deploy APK to GitHub Pages
 
-# DISABLED: Only allow manual trigger via workflow_dispatch
-# Removed automatic push trigger - use Fastlane instead
 on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - app/build.gradle.kts
+      - pushtest/build.gradle.kts
   workflow_dispatch:
 
 permissions:
@@ -38,7 +38,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip apk deploy]')
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -53,38 +53,30 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Increase app version
+      - name: Get current versions
+        id: versions
         run: |
-          task_code=$(sed -n 's/^[[:space:]]*versionCode = \([0-9][0-9]*\).*/\1/p' app/build.gradle.kts)
-          task_name=$(sed -n 's/^[[:space:]]*versionName = "\([0-9.][0-9.]*\)".*/\1/p' app/build.gradle.kts)
-          IFS=. read -r task_major task_minor task_patch <<< "$task_name"
-          task_patch=${task_patch:-0}
-          task_next_code=$((task_code + 1))
-          task_next_name="${task_major}.${task_minor}.$((task_patch + 1))"
-          sed -i "s/versionCode = ${task_code}/versionCode = ${task_next_code}/" app/build.gradle.kts
-          sed -i "s/versionName = \"${task_name}\"/versionName = \"${task_next_name}\"/" app/build.gradle.kts
-          echo "APK_FILE=VPCoffee-v${task_next_name}.apk" >> "$GITHUB_ENV"
-          echo "VERSION_NAME=${task_next_name}" >> "$GITHUB_ENV"
+          vp_name=$(sed -n 's/^[[:space:]]*versionName = "\([0-9.][0-9.]*\)".*/\1/p' app/build.gradle.kts)
+          vp_code=$(sed -n 's/^[[:space:]]*versionCode = \([0-9][0-9]*\).*/\1/p' app/build.gradle.kts)
+          pt_name=$(sed -n 's/^[[:space:]]*versionName = "\([0-9.][0-9.]*\)".*/\1/p' pushtest/build.gradle.kts)
+          pt_code=$(sed -n 's/^[[:space:]]*versionCode = \([0-9][0-9]*\).*/\1/p' pushtest/build.gradle.kts)
+          echo "VP_VERSION=${vp_name} (${vp_code})" >> "$GITHUB_ENV"
+          echo "PT_VERSION=${pt_name} (${pt_code})" >> "$GITHUB_ENV"
 
-      - name: Build debug APK
-        run: ./gradlew :app:assembleDebug
+      - name: Build debug APKs
+        run: |
+          ./gradlew :app:assembleDebug
+          ./gradlew :pushtest:assembleDebug
 
       - name: Prepare GitHub Pages site
         run: |
           mkdir -p site
-          cp app/build/outputs/apk/debug/app-debug.apk "site/${APK_FILE}"
+          cp app/build/outputs/apk/debug/app-debug.apk "site/VPCoffee.apk"
+          cp pushtest/build/outputs/apk/debug/pushtest-debug.apk "site/VPCoffeePushTest.apk"
           sed \
-            -e "s/__APK_FILE__/${APK_FILE}/g" \
-            -e "s/__VERSION__/${VERSION_NAME}/g" \
-            index.html > site/index.html
-
-      - name: Commit version update
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/build.gradle.kts
-          git commit -m "chore: release v${VERSION_NAME} [skip apk deploy]"
-          git push origin HEAD:main
+            -e "s|__VP_VERSION__|${VP_VERSION}|g" \
+            -e "s|__PT_VERSION__|${PT_VERSION}|g" \
+            template_index.html > site/index.html
 
       - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
@@ -92,7 +84,7 @@ jobs:
           path: site
 
   deploy:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || !contains(github.event.head_commit.message, '[skip apk deploy]')
     needs: build
     runs-on: ubuntu-latest
     environment:
