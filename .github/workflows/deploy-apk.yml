@@ -54,8 +54,11 @@ jobs:
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
+          # Create credentials directory
+          mkdir -p credentials
+
           # Set service account for Firebase
-          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}" > credentials/service-account.json
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > credentials/service-account.json
 
           # Set GitHub token for push
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
